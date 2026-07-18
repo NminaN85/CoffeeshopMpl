@@ -1,0 +1,210 @@
+/* 🎛️ حاوية لوحة التحكم الرئيسية */
+.dashboard-container {
+    width: 100%;
+    max-width: 1200px;
+    min-height: 100vh;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    overflow-y: auto;
+}
+
+/* 📱 ستايل الهيدر الفخم */
+.dash-header {
+    background: rgba(20, 16, 13, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-radius: 16px;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand i {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 8px var(--gold-glow));
+}
+
+.brand-text h2 {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.brand-text span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: color 0.3s;
+}
+
+.notification-bell:hover {
+    color: var(--gold);
+}
+
+.bell-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: #ff453a;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff453a;
+}
+
+.btn-logout {
+    background: rgba(255, 69, 58, 0.1);
+    border: 1px solid rgba(255, 69, 58, 0.2);
+    color: #ff453a;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    background: #ff453a;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 69, 58, 0.4);
+}
+
+/* 📊 تقسيم كروت البيانات (Responsive Grid) */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.metric-card {
+    background: rgba(26, 22, 19, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.25);
+}
+
+.premium-glow {
+    border-color: rgba(212, 175, 55, 0.2);
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.05);
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(212, 175, 55, 0.08);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+    color: var(--gold);
+}
+
+.card-icon.success { background: rgba(52, 199, 89, 0.08); color: #34c759; }
+.card-icon.danger { background: rgba(255, 69, 58, 0.08); color: #ff453a; }
+.card-icon.info { background: rgba(10, 132, 255, 0.08); color: #0a84ff; }
+
+.card-info h3 {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.card-info p {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.share-value-card .card-info p {
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+/* 📈 ستايل قسم الرسم البياني */
+.chart-container {
+    background: rgba(20, 16, 13, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.chart-header h3 {
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+}
+
+.badge {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 320px;
+}
+
+.gold-text { color: var(--gold); }
+
+/* 📱 شاشات الموبايل الصغيرة جداً */
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    .dash-header {
+        padding: 12px 15px;
+    }
+    .brand-text h2 { font-size: 1rem; }
+}
