@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mocha Enterprise | Financial Dashboard</title>
+    <!-- Font Awesome الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة الرسوم البيانية Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ملفات الـ CSS الخارجي الخاص بك -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     
+    <!-- حل مشكلة السكرول وإجبار الصفحة على التمرير لأسفل -->
     <style>
         html, body {
             height: auto !important;
             min-height: 100vh !important;
             overflow: auto !important;
-            overflow-y: scroll !important; /* إجبار ظهور شريط التمرير العمودي */
+            overflow-y: scroll !important;
         }
         
         .dashboard-container {
@@ -22,7 +26,7 @@
             min-height: 100vh !important;
             overflow: visible !important;
             overflow-y: visible !important;
-            padding-bottom: 60px !important; /* مساحة أمان تحت خالص */
+            padding-bottom: 60px !important;
         }
 
         .metrics-grid {
@@ -40,6 +44,7 @@
 
     <div class="dashboard-container">
         
+        <!-- الهيدر -->
         <header class="dash-header">
             <div class="brand">
                 <i class="fa-solid fa-crown gold-text"></i>
@@ -59,8 +64,10 @@
             </div>
         </header>
 
+        <!-- 📊 شبكة كروت البيانات المتكاملة -->
         <section class="metrics-grid">
             
+            <!-- 1. إجمالي الأرباح -->
             <div class="metric-card premium-glow">
                 <div class="card-icon"><i class="fa-solid fa-chart-line-up"></i></div>
                 <div class="card-info">
@@ -69,6 +76,7 @@
                 </div>
             </div>
 
+            <!-- 2. الإيرادات -->
             <div class="metric-card">
                 <div class="card-icon success"><i class="fa-solid fa-wallet"></i></div>
                 <div class="card-info">
@@ -77,6 +85,7 @@
                 </div>
             </div>
 
+            <!-- 3. المصروفات -->
             <div class="metric-card">
                 <div class="card-icon danger"><i class="fa-solid fa-receipt"></i></div>
                 <div class="card-info">
@@ -85,6 +94,7 @@
                 </div>
             </div>
 
+            <!-- 4. عدد المستثمرين لايف من الشيت -->
             <div class="metric-card">
                 <div class="card-icon info"><i class="fa-solid fa-users"></i></div>
                 <div class="card-info">
@@ -93,6 +103,7 @@
                 </div>
             </div>
 
+            <!-- 5. قيمة السهم الثابتة -->
             <div class="metric-card share-value-card">
                 <div class="card-icon gold"><i class="fa-solid fa-gem"></i></div>
                 <div class="card-info">
@@ -101,6 +112,7 @@
                 </div>
             </div>
 
+            <!-- 6. ربح السهم (Share Profit) -->
             <div class="metric-card premium-glow">
                 <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
                 <div class="card-info">
@@ -109,6 +121,7 @@
                 </div>
             </div>
 
+            <!-- 7. صافي ربح السهم بالجولد بعد خصم الـ 7% -->
             <div class="metric-card premium-glow share-value-card">
                 <div class="card-icon"><i class="fa-solid fa-coins"></i></div>
                 <div class="card-info">
@@ -117,6 +130,7 @@
                 </div>
             </div>
 
+            <!-- 8. حالة المزامنة والسيستم -->
             <div class="metric-card" style="opacity: 0.7;">
                 <div class="card-icon info"><i class="fa-solid fa-clock"></i></div>
                 <div class="card-info">
@@ -127,6 +141,7 @@
 
         </section>
 
+        <!-- الشارت -->
         <section class="chart-container">
             <div class="chart-header">
                 <h3><i class="fa-solid fa-chart-area gold-text"></i> Fund Performance Growth</h3>
@@ -188,7 +203,7 @@
         async function fetchLiveSheetData() {
             let totalRevenues = 44.00;
             let totalExpenses = 138.66;
-            let liveInvestors = 42; 
+            let liveInvestors = 0; // القيمة الافتراضية صفر لحين القراءة الإيجابية
 
             try {
                 const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime());
@@ -201,8 +216,9 @@
                     let tempRev = 0;
                     let tempExp = 0;
 
-                    if (rows[1] && rows[1].c && rows[1].c[4]) {
-                        let invVal = parseInt(rows[1].c[4].v);
+                    // 🛠️ التعديل السحري هنا: قراءة الخلية E2 برمجياً تعني rows[0].c[4]
+                    if (rows[0] && rows[0].c && rows[0].c[4]) {
+                        let invVal = parseInt(rows[0].c[4].v);
                         if (!isNaN(invVal)) liveInvestors = invVal;
                     }
 
