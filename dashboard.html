@@ -11,6 +11,28 @@
     <!-- ملفات الـ CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- 🛠️ إجبار الشبكة على عرض كافة الكروت دون قص -->
+    <style>
+        .metrics-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+            gap: 20px !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        .metric-card {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -87,8 +109,8 @@
             </div>
 
             <!-- 6. ربح السهم (Share Profit) -->
-            <div class="metric-card">
-                <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+            <div class="metric-card premium-glow">
+                <div class="card-icon gold"><i class="fa-solid fa-money-bill-trend-up"></i></div>
                 <div class="card-info">
                     <h3>Share Profit</h3>
                     <p class="counter" id="share-profit">0.00 Gold</p>
@@ -137,7 +159,7 @@
 
     </div>
 
-    <!-- ⬇️ كود الجافا سكريبت المعدل بالكامل لطباعة الـ Gold ⬇️ -->
+    <!-- ⬇️ سكريبت الحسابات والمزامنة ⬇️ -->
     <script>
         if (localStorage.getItem('mocha_auth') !== 'true') {
             window.location.href = 'index.html';
@@ -200,7 +222,6 @@
                     let tempRev = 0;
                     let tempExp = 0;
 
-                    // لقط المستثمرين من E2
                     if (rows[1] && rows[1].c && rows[1].c[4]) {
                         let invVal = parseInt(rows[1].c[4].v);
                         if (!isNaN(invVal)) liveInvestors = invVal;
@@ -227,34 +248,27 @@
                 console.error("Using fallback data:", error);
             }
 
-            // الحسابات المطلوبة بالملّي:
             const totalProfits = totalRevenues - totalExpenses;
-            
-            // 1. Share Profit = total profit / 120
             const shareProfit = totalProfits / 120;
-            
-            // 2. Net Share Profit = share profit - 7%
             const netShareProfit = shareProfit * 0.93;
 
             const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
             document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
             document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
 
-            // ضخ الأرقام في الـ IDs الجديدة المظبوطة مع كلمة Gold
             animateCurrency(document.getElementById("total-profits"), totalProfits);
             animateCurrency(document.getElementById("revenues"), totalRevenues);
             animateCurrency(document.getElementById("expenses"), totalExpenses);
             animateValue(document.getElementById("investors-count"), 0, liveInvestors, 1000); 
             
-            animateCurrency(document.getElementById("share-value"), 30); // ثابتة
-            animateCurrency(document.getElementById("share-profit"), shareProfit); // الكارت السادس
-            animateCurrency(document.getElementById("net-share-profit"), netShareProfit); // الكارت السابع
+            animateCurrency(document.getElementById("share-value"), 30); 
+            animateCurrency(document.getElementById("share-profit"), shareProfit); 
+            animateCurrency(document.getElementById("net-share-profit"), netShareProfit); 
 
             window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
             window.myChart.update();
         }
 
-        // دالة تحويل الرمز لـ Gold بدلاً من اليورو
         function animateCurrency(element, targetValue) {
             if(!element) return;
             let startTimestamp = null;
