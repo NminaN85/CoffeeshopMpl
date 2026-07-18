@@ -8,6 +8,31 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <style>
+        html, body {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow: auto !important;
+            overflow-y: scroll !important; /* إجبار ظهور شريط التمرير العمودي */
+        }
+        
+        .dashboard-container {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow: visible !important;
+            overflow-y: visible !important;
+            padding-bottom: 60px !important; /* مساحة أمان تحت خالص */
+        }
+
+        .metrics-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 20px !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -176,7 +201,6 @@
                     let tempRev = 0;
                     let tempExp = 0;
 
-                    // لقط المستثمرين الحقيقي من E2
                     if (rows[1] && rows[1].c && rows[1].c[4]) {
                         let invVal = parseInt(rows[1].c[4].v);
                         if (!isNaN(invVal)) liveInvestors = invVal;
@@ -203,24 +227,22 @@
                 console.error("Using fallback data:", error);
             }
 
-            // الحسابات المعتمدة:
             const totalProfits = totalRevenues - totalExpenses;
             const shareProfit = totalProfits / 120;
-            const netShareProfit = shareProfit * 0.93; // خصم 7%
+            const netShareProfit = shareProfit * 0.93; 
 
             const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
             document.getElementById("sync-time").innerText = "Synced: " + timeString;
             document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
 
-            // ضخ الأرقام لايف في الكروت والـ IDs بالأنيميشن
             animateCurrency(document.getElementById("total-profits"), totalProfits);
             animateCurrency(document.getElementById("revenues"), totalRevenues);
             animateCurrency(document.getElementById("expenses"), totalExpenses);
             animateValue(document.getElementById("investors-count"), 0, liveInvestors, 1000); 
             
-            animateCurrency(document.getElementById("share-value"), 30); // ثابتة
-            animateCurrency(document.getElementById("share-profit"), shareProfit); // كارت 6
-            animateCurrency(document.getElementById("net-share-profit"), netShareProfit); // كارت 7
+            animateCurrency(document.getElementById("share-value"), 30); 
+            animateCurrency(document.getElementById("share-profit"), shareProfit); 
+            animateCurrency(document.getElementById("net-share-profit"), netShareProfit); 
 
             window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
             window.myChart.update();
