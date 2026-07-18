@@ -1,62 +1,55 @@
-// 🔗 الرابط الخاص بالشيت بتاعك (Sheet2)
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json&sheet=Sheet2";
+// 🔗 رابط التصدير السريع والمباشر بصيغة CSV لورقة العمل الثانية
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/export?format=csv&gid=1116639595";
 
 async function fetchLiveSheetData() {
     try {
         const response = await fetch(SHEET_URL);
-        const text = await response.text();
+        const dataText = await response.text();
         
-        // تنظيف الجافا سكريبت القادم من جوجل وتحويله لـ JSON
-        const jsonData = JSON.parse(text.substr(47).slice(0, -2));
-        const rows = jsonData.table.rows;
-
+        // تحويل نص الـ CSV إلى سطور وأعمدة
+        const rows = dataText.split("\n").map(row => row.split(","));
+        
         let totalRevenues = 0;
         let totalExpenses = 0;
 
-        // 🔄 اللف على كل السطور في الجدول وجمع البيانات تلقائياً
-        // السطر الأول (index 0) فيه العناوين، عشان كده بنبدأ من السطر الثاني (index 1)
+        // 🔄 اللف على السطور بدءاً من السطر الثاني (index 1) لتجميع الأرقام
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
-            if (row && row.c) {
-                // العمود B (index 1) هو الإيرادات
-                const revVal = row.c[1]?.v;
-                if (typeof revVal === 'number') totalRevenues += revVal;
+            if (row && row.length >= 3) {
+                // تنظيف الأرقام من أي مسافات أو علامات غريبة
+                const revVal = parseFloat(row[1]?.replace(/[^0-9.-]/g, ""));
+                const expVal = parseFloat(row[2]?.replace(/[^0-9.-]/g, ""));
 
-                // العمود C (index 2) هو المصروفات
-                const expVal = row.c[2]?.v;
-                if (typeof expVal === 'number') totalExpenses += expVal;
+                if (!isNaN(revVal)) totalRevenues += revVal;
+                if (!isNaN(expVal)) totalExpenses += expVal;
             }
         }
 
-        // 🧮 الحسبه الذكية للأرقام المطلوبة في الداشبورد
-        const totalProfits = totalRevenues - totalExpenses; // الأرباح = الإيرادات - المصروفات
-        const shareValue = 1.25; // قيمة السهم الثابتة اللي اتفقت عليها
-        const investorsCount = 42; // رقم افتراضي للمستثمرين (تقدر تثبته أو نغيره لاحقاً)
+        // الحسابات
+        const totalProfits = totalRevenues - totalExpenses;
 
         const liveData = {
             totalProfits: totalProfits,
             revenues: totalRevenues,
             expenses: totalExpenses,
-            investors: investorsCount,
-            shareValue: shareValue,
-            weeklyProfit: totalProfits, // كبداية هنخليهم نفس صافي الأرباح
+            investors: 42, // ثابت حالياً
+            shareValue: 1.25, // ثابت حالياً
+            weeklyProfit: totalProfits,
             monthlyProfit: totalProfits,
-            alertMessage: "System Dynamic Ledger Active. Payouts Secure."
+            alertMessage: "Live Dynamic Tracking Active."
         };
 
-        // تحديث اللوحة بالبيانات الحقيقية المحسوبة
         updateDashboardWithLiveData(liveData);
 
     } catch (error) {
-        console.error("Error calculating dynamic data from sheet:", error);
-        document.getElementById("sync-time").innerText = "⚠️ Sync Failed";
+        console.error("Error syncing with CSV Sheet:", error);
+        document.getElementById("sync-time").innerText = "⚠️ Connection Refused";
     }
 }
 
 function updateDashboardWithLiveData(data) {
     const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
     
-    // تشغيل أنيميشن العدادات بناءً على أرقام الشيت الحقيقية
     animateCurrency(document.getElementById("total-profits"), data.totalProfits);
     animateCurrency(document.getElementById("revenues"), data.revenues);
     animateCurrency(document.getElementById("expenses"), data.expenses);
@@ -71,7 +64,6 @@ function updateDashboardWithLiveData(data) {
     document.getElementById("system-alert").innerText = data.alertMessage;
 }
 
-// تشغيل جلب البيانات فور تحميل الصفحة
 document.addEventListener("DOMContentLoaded", () => {
     fetchLiveSheetData();
 });
