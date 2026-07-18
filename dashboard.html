@@ -38,9 +38,10 @@
             </div>
         </header>
 
-        <!-- كروت الـ 9 -->
+        <!-- شبكة الكروت الـ 9 المحدثة بالكامل -->
         <section class="metrics-grid">
             
+            <!-- 1. إجمالي الأرباح -->
             <div class="metric-card premium-glow">
                 <div class="card-icon"><i class="fa-solid fa-chart-line-up"></i></div>
                 <div class="card-info">
@@ -49,6 +50,7 @@
                 </div>
             </div>
 
+            <!-- 2. الإيرادات -->
             <div class="metric-card">
                 <div class="card-icon success"><i class="fa-solid fa-wallet"></i></div>
                 <div class="card-info">
@@ -57,6 +59,7 @@
                 </div>
             </div>
 
+            <!-- 3. المصروفات -->
             <div class="metric-card">
                 <div class="card-icon danger"><i class="fa-solid fa-receipt"></i></div>
                 <div class="card-info">
@@ -65,38 +68,43 @@
                 </div>
             </div>
 
+            <!-- 4. عدد المستثمرين الحقيقي من الشيت -->
             <div class="metric-card">
                 <div class="card-icon info"><i class="fa-solid fa-users"></i></div>
                 <div class="card-info">
                     <h3>Investors</h3>
-                    <p class="counter-pure" id="investors-count">42</p>
+                    <p class="counter-pure" id="investors-count">0</p>
                 </div>
             </div>
 
+            <!-- 5. قيمة السهم الثابتة (30 جولد) -->
             <div class="metric-card share-value-card">
                 <div class="card-icon gold"><i class="fa-solid fa-gem"></i></div>
                 <div class="card-info">
                     <h3>Share Value</h3>
-                    <p class="counter" id="share-value">€1.25</p>
+                    <p class="counter" id="share-value">€30.00</p>
                 </div>
             </div>
 
+            <!-- 6. ربح السهم (جديد) -->
             <div class="metric-card">
-                <div class="card-icon"><i class="fa-solid fa-calendar-week"></i></div>
+                <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
                 <div class="card-info">
-                    <h3>Weekly Profit</h3>
-                    <p class="counter" id="weekly-profit">€0.00</p>
+                    <h3>Share Profit</h3>
+                    <p class="counter" id="share-profit">€0.00</p>
                 </div>
             </div>
 
-            <div class="metric-card">
-                <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
+            <!-- 7. صافي ربح السهم بالجولد بعد خصم الـ 7% (جديد) -->
+            <div class="metric-card premium-glow">
+                <div class="card-icon gold-text"><i class="fa-solid fa-coins"></i></div>
                 <div class="card-info">
-                    <h3>Monthly Profit</h3>
-                    <p class="counter" id="monthly-profit">€0.00</p>
+                    <h3>Net Share Profit (-7%)</h3>
+                    <p class="counter" id="net-share-profit">€0.00</p>
                 </div>
             </div>
 
+            <!-- 8. حالة المزامنة -->
             <div class="metric-card timestamp-card">
                 <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
                 <div class="card-info">
@@ -105,11 +113,12 @@
                 </div>
             </div>
 
+            <!-- 9. التنبيهات -->
             <div class="metric-card alert-card">
                 <div class="card-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
                 <div class="card-info">
                     <h3>System Alert</h3>
-                    <p id="system-alert">Secure Ledger Engine Active.</p>
+                    <p id="system-alert">Calculations Configured: 120 Shares System.</p>
                 </div>
             </div>
 
@@ -128,7 +137,7 @@
 
     </div>
 
-       <!-- ⬇️ كود الحسابات المطور: حسابات الأسهم، الجولد، والمستثمرين اللايف ⬇️ -->
+    <!-- ⬇️ كود الحسابات المعدل بالمعادلات الصحيحة ⬇️ -->
     <script>
         if (localStorage.getItem('mocha_auth') !== 'true') {
             window.location.href = 'index.html';
@@ -176,7 +185,6 @@
         });
 
         async function fetchLiveSheetData() {
-            // قيم احتياطية أساسية في حال فشل الاتصال لسبب ما
             let totalRevenues = 44.00;
             let totalExpenses = 138.66;
             let liveInvestors = 42; 
@@ -192,13 +200,13 @@
                     let tempRev = 0;
                     let tempExp = 0;
 
-                    // 1. لقط عدد المستثمرين الحقيقي من الخلية E2 (الصف الثاني index 1، العمود الخامس index 4)
+                    // جلب عدد المستثمرين لايف من الخلية E2
                     if (rows[1] && rows[1].c && rows[1].c[4]) {
                         let invVal = parseInt(rows[1].c[4].v);
                         if (!isNaN(invVal)) liveInvestors = invVal;
                     }
 
-                    // 2. تجميع الإيرادات والمصروفات سطر بسطر
+                    // جمع الإيرادات والمصروفات
                     for (let i = 0; i < rows.length; i++) {
                         const row = rows[i];
                         if (row && row.c) {
@@ -220,41 +228,32 @@
                 console.error("Using fallback data:", error);
             }
 
-            // 🧮 العمليات الحسابية الذكية للأسهم والجولد
+            // 🧮 الحسابات الدقيقة الجديدة:
             const totalProfits = totalRevenues - totalExpenses;
             
-            // أ) مكسب السهم الواحد (صافي الأرباح تقسيم 120 سهم)
+            // 1. Share Profit = total profit / 120
             const shareProfit = totalProfits / 120;
             
-            // ب) المكسب الفعلي بالجولد بعد خصم الـ 7% (مكسب السهم * 0.93)
-            const goldPayout = shareProfit * 0.93;
+            // 2. Net Share Profit = share profit - 7%
+            const netShareProfit = shareProfit * 0.93;
 
-            // 📱 تحديث نصوص الحالة
             const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
             document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
             document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
 
-            // 🎯 ضخ البيانات في الكروت الـ 9 بالأنيميشن
+            // تطبيق البيانات على الواجهة بالأنيميشن
             animateCurrency(document.getElementById("total-profits"), totalProfits);
             animateCurrency(document.getElementById("revenues"), totalRevenues);
             animateCurrency(document.getElementById("expenses"), totalExpenses);
-            
-            // كارت المستثمرين: لقط الرقم الحقيقي من الشيت أوتوماتيك
             animateValue(document.getElementById("investors-count"), 0, liveInvestors, 1000); 
             
-            // كارت سعر السهم (Share Value): هيعرض الآن مكسب السهم الواحد قبل الخصم
-            animateCurrency(document.getElementById("share-value"), shareProfit);
+            // تثبيت قيمة السهم على 30 جولد دائماً كما طلبت
+            animateCurrency(document.getElementById("share-value"), 30);
             
-            // كارت أرباح الأسبوع (Weekly Profit): هنخليه يعرض صافي الربح الفعلي بالجولد (بعد خصم 7%)
-            animateCurrency(document.getElementById("weekly-profit"), goldPayout);
-            
-            // كارت أرباح الشهر (Monthly Profit): هنعرض فيه إجمالي قيمة الـ 120 سهم بالجولد كمثال توضيحي أو نثبته
-            animateCurrency(document.getElementById("monthly-profit"), goldPayout * 120);
+            // عرض ربح السهم الصافي والربح بعد الخصم في الكروت الجديدة
+            animateCurrency(document.getElementById("share-profit"), shareProfit);
+            animateCurrency(document.getElementById("net-share-profit"), netShareProfit);
 
-            // تحديث رسالة النظام لتوضيح الحسبة
-            document.getElementById("system-alert").innerText = "Gold Payout Active (-7% Fee Applied). Total Shares: 120.";
-            
-            // تحديث الشارت
             window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
             window.myChart.update();
         }
@@ -290,6 +289,5 @@
             window.requestAnimationFrame(step);
         }
     </script>
-
 </body>
 </html>
