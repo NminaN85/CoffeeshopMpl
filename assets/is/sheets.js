@@ -1,33 +1,54 @@
-// 🔗 الرابط المتزامن مباشرة مع الـ Google Sheet الخاص بك
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+// 🔗 الرابط الخاص بالشيت بتاعك (Sheet2)
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json&sheet=Sheet2";
 
 async function fetchLiveSheetData() {
     try {
         const response = await fetch(SHEET_URL);
         const text = await response.text();
         
-        // تنظيف البيانات وتحويلها لـ JSON صريح يفهمه المتصفح
+        // تنظيف الجافا سكريبت القادم من جوجل وتحويله لـ JSON
         const jsonData = JSON.parse(text.substr(47).slice(0, -2));
         const rows = jsonData.table.rows;
 
-        // 💡 الكود يفترض أن الأرقام الـ 8 موجودة بالترتيب في الصف الأول (Row 0) من العمود A إلى H
-        // إذا كانت الداتا في خلايا مختلفة، يمكنك تعديل الترتيب أدناه [0], [1], [2]... إلخ
+        let totalRevenues = 0;
+        let totalExpenses = 0;
+
+        // 🔄 اللف على كل السطور في الجدول وجمع البيانات تلقائياً
+        // السطر الأول (index 0) فيه العناوين، عشان كده بنبدأ من السطر الثاني (index 1)
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row && row.c) {
+                // العمود B (index 1) هو الإيرادات
+                const revVal = row.c[1]?.v;
+                if (typeof revVal === 'number') totalRevenues += revVal;
+
+                // العمود C (index 2) هو المصروفات
+                const expVal = row.c[2]?.v;
+                if (typeof expVal === 'number') totalExpenses += expVal;
+            }
+        }
+
+        // 🧮 الحسبه الذكية للأرقام المطلوبة في الداشبورد
+        const totalProfits = totalRevenues - totalExpenses; // الأرباح = الإيرادات - المصروفات
+        const shareValue = 1.25; // قيمة السهم الثابتة اللي اتفقت عليها
+        const investorsCount = 42; // رقم افتراضي للمستثمرين (تقدر تثبته أو نغيره لاحقاً)
+
         const liveData = {
-            totalProfits: parseFloat(rows[0].c[0]?.v) || 0,   // العمود A (إجمالي الأرباح)
-            revenues: parseFloat(rows[0].c[1]?.v) || 0,       // العمود B (الإيرادات)
-            expenses: parseFloat(rows[0].c[2]?.v) || 0,       // العمود C (المصروفات)
-            investors: parseInt(rows[0].c[3]?.v) || 0,        // العمود D (عدد المستثمرين)
-            shareValue: parseFloat(rows[0].c[4]?.v) || 0,      // العمود E (قيمة السهم)
-            weeklyProfit: parseFloat(rows[0].c[5]?.v) || 0,    // العمود F (أرباح الأسبوع)
-            monthlyProfit: parseFloat(rows[0].c[6]?.v) || 0,   // العمود G (أرباح الشهر)
-            alertMessage: rows[0].c[7]?.v || "Systems Stable. Payouts Secure.", // العمود H (رسالة النظام)
+            totalProfits: totalProfits,
+            revenues: totalRevenues,
+            expenses: totalExpenses,
+            investors: investorsCount,
+            shareValue: shareValue,
+            weeklyProfit: totalProfits, // كبداية هنخليهم نفس صافي الأرباح
+            monthlyProfit: totalProfits,
+            alertMessage: "System Dynamic Ledger Active. Payouts Secure."
         };
 
-        // تحديث لوحة التحكم والأرقام المتحركة بالبيانات الحقيقية
+        // تحديث اللوحة بالبيانات الحقيقية المحسوبة
         updateDashboardWithLiveData(liveData);
 
     } catch (error) {
-        console.error("Error syncing with Google Sheets:", error);
+        console.error("Error calculating dynamic data from sheet:", error);
         document.getElementById("sync-time").innerText = "⚠️ Sync Failed";
     }
 }
@@ -43,16 +64,14 @@ function updateDashboardWithLiveData(data) {
     animateCurrency(document.getElementById("weekly-profit"), data.weeklyProfit);
     animateCurrency(document.getElementById("monthly-profit"), data.monthlyProfit);
     
-    // تحريك عداد المستثمرين كعدد صحيح
     animateValue(document.getElementById("investors-count"), 0, data.investors, 1500);
 
-    // تحديث التوقيت نصوص الحالة
     document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
     document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
     document.getElementById("system-alert").innerText = data.alertMessage;
 }
 
-// تشغيل دالة سحب البيانات بمجرد فتح الصفحة
+// تشغيل جلب البيانات فور تحميل الصفحة
 document.addEventListener("DOMContentLoaded", () => {
     fetchLiveSheetData();
 });
