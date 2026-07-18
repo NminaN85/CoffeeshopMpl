@@ -1,210 +1,261 @@
-/* 🎛️ حاوية لوحة التحكم الرئيسية */
-.dashboard-container {
-    width: 100%;
-    max-width: 1200px;
-    min-height: 100vh;
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    overflow-y: auto;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mocha Enterprise | Financial Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
 
-/* 📱 ستايل الهيدر الفخم */
-.dash-header {
-    background: rgba(20, 16, 13, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(212, 175, 55, 0.1);
-    border-radius: 16px;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
+    <div class="bg-overlay"></div>
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+    <div class="dashboard-container">
+        
+        <header class="dash-header">
+            <div class="brand">
+                <i class="fa-solid fa-crown gold-text"></i>
+                <div class="brand-text">
+                    <h2>MOCHA HUB</h2>
+                    <span id="last-update">🔄 System Initializing...</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="notification-bell">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="bell-dot"></span>
+                </div>
+                <button onclick="handleLogout()" class="btn-logout">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </header>
 
-.brand i {
-    font-size: 1.5rem;
-    filter: drop-shadow(0 0 8px var(--gold-glow));
-}
+        <section class="metrics-grid">
+            
+            <div class="metric-card premium-glow">
+                <div class="card-icon"><i class="fa-solid fa-chart-line-up"></i></div>
+                <div class="card-info">
+                    <h3>Total Profits</h3>
+                    <p class="counter" id="total-profits">0.00 Gold</p>
+                </div>
+            </div>
 
-.brand-text h2 {
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    font-weight: 700;
-}
+            <div class="metric-card">
+                <div class="card-icon success"><i class="fa-solid fa-wallet"></i></div>
+                <div class="card-info">
+                    <h3>Revenues</h3>
+                    <p class="counter" id="revenues">0.00 Gold</p>
+                </div>
+            </div>
 
-.brand-text span {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
+            <div class="metric-card">
+                <div class="card-icon danger"><i class="fa-solid fa-receipt"></i></div>
+                <div class="card-info">
+                    <h3>Expenses</h3>
+                    <p class="counter" id="expenses">0.00 Gold</p>
+                </div>
+            </div>
 
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
+            <div class="metric-card">
+                <div class="card-icon info"><i class="fa-solid fa-users"></i></div>
+                <div class="card-info">
+                    <h3>Investors</h3>
+                    <p id="investors-count">0</p>
+                </div>
+            </div>
 
-.notification-bell {
-    position: relative;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    transition: color 0.3s;
-}
+            <div class="metric-card share-value-card">
+                <div class="card-icon gold"><i class="fa-solid fa-gem"></i></div>
+                <div class="card-info">
+                    <h3>Share Value</h3>
+                    <p class="counter" id="share-value">30.00 Gold</p>
+                </div>
+            </div>
 
-.notification-bell:hover {
-    color: var(--gold);
-}
+            <div class="metric-card premium-glow">
+                <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                <div class="card-info">
+                    <h3>Share Profit</h3>
+                    <p class="counter" id="share-profit">0.00 Gold</p>
+                </div>
+            </div>
 
-.bell-dot {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 8px;
-    height: 8px;
-    background: #ff453a;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #ff453a;
-}
+            <div class="metric-card premium-glow share-value-card">
+                <div class="card-icon"><i class="fa-solid fa-coins"></i></div>
+                <div class="card-info">
+                    <h3>Net Share Profit (-7%)</h3>
+                    <p class="counter" id="net-share-profit">0.00 Gold</p>
+                </div>
+            </div>
 
-.btn-logout {
-    background: rgba(255, 69, 58, 0.1);
-    border: 1px solid rgba(255, 69, 58, 0.2);
-    color: #ff453a;
-    padding: 10px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
+            <div class="metric-card" style="opacity: 0.7;">
+                <div class="card-icon info"><i class="fa-solid fa-clock"></i></div>
+                <div class="card-info">
+                    <h3>Sync Status</h3>
+                    <p id="sync-time" style="font-size: 1.1rem !important; font-weight: normal;">Fetching Data...</p>
+                </div>
+            </div>
 
-.btn-logout:hover {
-    background: #ff453a;
-    color: #fff;
-    box-shadow: 0 0 15px rgba(255, 69, 58, 0.4);
-}
+        </section>
 
-/* 📊 تقسيم كروت البيانات (Responsive Grid) */
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-}
+        <section class="chart-container">
+            <div class="chart-header">
+                <h3><i class="fa-solid fa-chart-area gold-text"></i> Fund Performance Growth</h3>
+                <span class="badge">Live Analytics</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </section>
 
-.metric-card {
-    background: rgba(26, 22, 19, 0.5);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 18px;
-    padding: 22px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
+    </div>
 
-.metric-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(212, 175, 55, 0.25);
-}
+    <script>
+        if (localStorage.getItem('mocha_auth') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        function handleLogout() {
+            localStorage.removeItem('mocha_auth');
+            window.location.href = 'index.html';
+        }
 
-.premium-glow {
-    border-color: rgba(212, 175, 55, 0.2);
-    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.05);
-}
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json&sheet=Sheet2";
 
-.card-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(212, 175, 55, 0.08);
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.3rem;
-    color: var(--gold);
-}
+        document.addEventListener("DOMContentLoaded", () => {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const goldGradient = ctx.createLinearGradient(0, 0, 0, 300);
+            goldGradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
+            goldGradient.addColorStop(1, 'rgba(212, 175, 55, 0.0)');
 
-.card-icon.success { background: rgba(52, 199, 89, 0.08); color: #34c759; }
-.card-icon.danger { background: rgba(255, 69, 58, 0.08); color: #ff453a; }
-.card-icon.info { background: rgba(10, 132, 255, 0.08); color: #0a84ff; }
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Fund Growth (Gold)',
+                        data: [10, 20, 30, 45, 60, 80, 100],
+                        borderColor: '#d4af37',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#d4af37',
+                        backgroundColor: goldGradient,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#a1a1a6' } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#a1a1a6' } }
+                    }
+                }
+            });
 
-.card-info h3 {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-}
+            fetchLiveSheetData();
+        });
 
-.card-info p {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #fff;
-}
+        async function fetchLiveSheetData() {
+            let totalRevenues = 44.00;
+            let totalExpenses = 138.66;
+            let liveInvestors = 42; 
 
-.share-value-card .card-info p {
-    color: var(--gold);
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-}
+            try {
+                const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime());
+                const text = await response.text();
+                
+                const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+                const rows = jsonData.table.rows;
 
-/* 📈 ستايل قسم الرسم البياني */
-.chart-container {
-    background: rgba(20, 16, 13, 0.5);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-}
+                if (rows && rows.length > 0) {
+                    let tempRev = 0;
+                    let tempExp = 0;
 
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
+                    // لقط المستثمرين الحقيقي من E2
+                    if (rows[1] && rows[1].c && rows[1].c[4]) {
+                        let invVal = parseInt(rows[1].c[4].v);
+                        if (!isNaN(invVal)) liveInvestors = invVal;
+                    }
 
-.chart-header h3 {
-    font-size: 1.05rem;
-    letter-spacing: 1px;
-}
+                    for (let i = 0; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (row && row.c) {
+                            let revVal = row.c[1] ? parseFloat(row.c[1].v) : 0;
+                            let expVal = row.c[2] ? parseFloat(row.c[2].v) : 0;
 
-.badge {
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    font-size: 0.7rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    font-weight: 600;
-}
+                            if (!isNaN(revVal)) tempRev += revVal;
+                            if (!isNaN(expVal)) tempExp += expVal;
+                        }
+                    }
+                    
+                    if(tempRev > 0 || tempExp > 0) {
+                        totalRevenues = tempRev;
+                        totalExpenses = tempExp;
+                    }
+                }
 
-.chart-wrapper {
-    position: relative;
-    width: 100%;
-    height: 320px;
-}
+            } catch (error) {
+                console.error("Using fallback data:", error);
+            }
 
-.gold-text { color: var(--gold); }
+            // الحسابات المعتمدة:
+            const totalProfits = totalRevenues - totalExpenses;
+            const shareProfit = totalProfits / 120;
+            const netShareProfit = shareProfit * 0.93; // خصم 7%
 
-/* 📱 شاشات الموبايل الصغيرة جداً */
-@media (max-width: 480px) {
-    .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-    .dash-header {
-        padding: 12px 15px;
-    }
-    .brand-text h2 { font-size: 1rem; }
-}
+            const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+            document.getElementById("sync-time").innerText = "Synced: " + timeString;
+            document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
+
+            // ضخ الأرقام لايف في الكروت والـ IDs بالأنيميشن
+            animateCurrency(document.getElementById("total-profits"), totalProfits);
+            animateCurrency(document.getElementById("revenues"), totalRevenues);
+            animateCurrency(document.getElementById("expenses"), totalExpenses);
+            animateValue(document.getElementById("investors-count"), 0, liveInvestors, 1000); 
+            
+            animateCurrency(document.getElementById("share-value"), 30); // ثابتة
+            animateCurrency(document.getElementById("share-profit"), shareProfit); // كارت 6
+            animateCurrency(document.getElementById("net-share-profit"), netShareProfit); // كارت 7
+
+            window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
+            window.myChart.update();
+        }
+
+        function animateCurrency(element, targetValue) {
+            if(!element) return;
+            let startTimestamp = null;
+            const duration = 1200;
+            function step(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = progress * targetValue;
+                
+                if (currentValue < 0) {
+                    element.innerText = "-" + Math.abs(currentValue).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + " Gold";
+                } else {
+                    element.innerText = currentValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + " Gold";
+                }
+                if (progress < 1) window.requestAnimationFrame(step);
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        function animateValue(obj, start, end, duration) {
+            if(!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
