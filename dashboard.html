@@ -4,22 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mocha Enterprise | Financial Dashboard</title>
-    <!-- Font Awesome الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- مكتبة الرسوم البيانية Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- ملفات الـ CSS -->
-    <link rel="stylesheet" href="assets/css/style.css"> <!-- الستايل العام -->
-    <link rel="stylesheet" href="assets/css/dashboard.css"> <!-- ستايل لوحة التحكم -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
 
-    <!-- 🌌 خلفية زجاجية ممتدة -->
     <div class="bg-overlay"></div>
 
     <div class="dashboard-container">
         
-        <!-- 📱 الهيدر العالي (Top Navigation) -->
         <header class="dash-header">
             <div class="brand">
                 <i class="fa-solid fa-crown gold-text"></i>
@@ -39,10 +34,8 @@
             </div>
         </header>
 
-        <!-- 📊 شبكة الكروت الـ 9 الاحترافية (The Grid) -->
         <section class="metrics-grid">
             
-            <!-- 1. إجمالي الأرباح -->
             <div class="metric-card premium-glow">
                 <div class="card-icon"><i class="fa-solid fa-chart-line-up"></i></div>
                 <div class="card-info">
@@ -51,7 +44,6 @@
                 </div>
             </div>
 
-            <!-- 2. الإيرادات -->
             <div class="metric-card">
                 <div class="card-icon success"><i class="fa-solid fa-wallet"></i></div>
                 <div class="card-info">
@@ -60,7 +52,6 @@
                 </div>
             </div>
 
-            <!-- 3. المصروفات -->
             <div class="metric-card">
                 <div class="card-icon danger"><i class="fa-solid fa-receipt"></i></div>
                 <div class="card-info">
@@ -69,7 +60,6 @@
                 </div>
             </div>
 
-            <!-- 4. عدد المستثمرين -->
             <div class="metric-card">
                 <div class="card-icon info"><i class="fa-solid fa-users"></i></div>
                 <div class="card-info">
@@ -78,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- 5. قيمة السهم -->
             <div class="metric-card share-value-card">
                 <div class="card-icon gold"><i class="fa-solid fa-gem"></i></div>
                 <div class="card-info">
@@ -87,7 +76,6 @@
                 </div>
             </div>
 
-            <!-- 6. أرباح هذا الأسبوع -->
             <div class="metric-card">
                 <div class="card-icon"><i class="fa-solid fa-calendar-week"></i></div>
                 <div class="card-info">
@@ -96,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- 7. أرباح هذا الشهر -->
             <div class="metric-card">
                 <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
                 <div class="card-info">
@@ -105,7 +92,6 @@
                 </div>
             </div>
 
-            <!-- 8. آخر تحديث (كارت فرعي لعرض التوقيت بدقة) -->
             <div class="metric-card timestamp-card">
                 <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
                 <div class="card-info">
@@ -114,18 +100,16 @@
                 </div>
             </div>
 
-            <!-- 9. الإشعار/حالة النظام -->
             <div class="metric-card alert-card">
                 <div class="card-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
                 <div class="card-info">
                     <h3>System Alert</h3>
-                    <p id="system-alert">All systems stable. Payouts secure.</p>
+                    <p id="system-alert">Live Dynamic Tracking Active.</p>
                 </div>
             </div>
 
         </section>
 
-        <!-- 📈 قسم الرسوم البيانية الفاخرة (Charts Section) -->
         <section class="chart-container">
             <div class="chart-header">
                 <h3><i class="fa-solid fa-chart-area gold-text"></i> Fund Performance Growth</h3>
@@ -138,20 +122,8 @@
 
     </div>
 
-    <!-- جافا سكريبت الأمان واللوحة -->
     <script>
-        // حماية الصفحة: لو مش مسجل دخول يرجعه لـ index.html فوراً
-        if (localStorage.getItem('mocha_auth') !== 'true') {
-            window.location.href = 'index.html';
-        }
-        function handleLogout() {
-            localStorage.removeItem('mocha_auth');
-            window.location.href = 'index.html';
-        }
-    </script>
-        <!-- ⬇️ كود التشغيل المدمج لمنع كاش المتصفح ⬇️ -->
-    <script>
-        // 1. حماية البوابة
+        // 1. حماية البوابة وتحقق تسجيل الدخول
         if (localStorage.getItem('mocha_auth') !== 'true') {
             window.location.href = 'index.html';
         }
@@ -160,11 +132,11 @@
             window.location.href = 'index.html';
         }
 
-        // 🔗 رابط جدولك المباشر
+        // 🔗 رابط تصدير شيت حساباتك (Sheet2) مباشر كـ CSV للتحايل على حماية جوجل
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/export?format=csv&gid=1116639595";
 
         document.addEventListener("DOMContentLoaded", () => {
-            // 2. بناء الرسم البياني
+            // 2. بناء الشارت الذهبي الفارغ مبدئياً لحين جلب البيانات
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const goldGradient = ctx.createLinearGradient(0, 0, 0, 300);
             goldGradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
@@ -176,7 +148,7 @@
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [{
                         label: 'Fund Growth (€)',
-                        data: [0, 0, 0, 0, 0, 0, 0], // سيبدأ بصفر ويتحدث
+                        data: [0, 0, 0, 0, 0, 0, 0],
                         borderColor: '#d4af37',
                         borderWidth: 3,
                         pointBackgroundColor: '#d4af37',
@@ -196,38 +168,47 @@
                 }
             });
 
-            // 3. استدعاء الداتا الحقيقية فوراً
+            // 3. جلب بيانات جدولك فوراً وحسابها
             fetchLiveSheetData();
         });
 
-        // 4. دالة جلب البيانات والعمليات الحسابية
+        // 4. الدالة الذكية لقراءة السطور وفصل الأعمدة بالفاصلة العادية والمنقوطة
         async function fetchLiveSheetData() {
             try {
-                const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime()); // كسر الكاش
+                // إضافة timestamp في نهاية الرابط لإجبار المتصفح على كسر الكاش تماماً
+                const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime());
                 const dataText = await response.text();
                 
-                const rows = dataText.split("\n").map(row => row.split(","));
+                const lines = dataText.split("\n");
                 
                 let totalRevenues = 0;
                 let totalExpenses = 0;
 
-                // جمع الخلايا
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
+                // اللف على كل السطور (نتخطى السطر الأول لأنه سطر العناوين)
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    
+                    // فحص إذا كان السطر مقسم بـ فاصلة منقوطة ; أو فاصلة عادية ,
+                    const row = lines[i].includes(';') ? lines[i].split(';') : lines[i].split(',');
+                    
                     if (row && row.length >= 3) {
-                        const revVal = parseFloat(row[1]?.replace(/[^0-9.-]/g, ""));
-                        const expVal = parseFloat(row[2]?.replace(/[^0-9.-]/g, ""));
+                        // تنظيف البيانات من أي علامات تنصيص زائدة أو مسافات
+                        let revStr = row[1] ? row[1].replace(/"/g, '').trim() : "";
+                        let expStr = row[2] ? row[2].replace(/"/g, '').trim() : "";
+                        
+                        let revVal = parseFloat(revStr);
+                        let expVal = parseFloat(expStr);
 
                         if (!isNaN(revVal)) totalRevenues += revVal;
                         if (!isNaN(expVal)) totalExpenses += expVal;
                     }
                 }
 
+                // حساب صافي الأرباح
                 const totalProfits = totalRevenues - totalExpenses;
-
-                // تحديث الشاشة
                 const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
                 
+                // تشغيل الأنيميشن بالأرقام الفعلية القادمة من جدولك
                 animateCurrency(document.getElementById("total-profits"), totalProfits);
                 animateCurrency(document.getElementById("revenues"), totalRevenues);
                 animateCurrency(document.getElementById("expenses"), totalExpenses);
@@ -239,7 +220,7 @@
                 document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
                 document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
                 
-                // تحديث بيانات الشارت بأرقام حقيقية تقريبية تصاعدية بناءً على أرباحك
+                // تحديث رسمة الشارت تلقائياً بناءً على تصاعد الأرباح
                 window.myChart.data.datasets[0].data = [
                     totalRevenues * 0.2, 
                     totalRevenues * 0.4, 
@@ -252,12 +233,12 @@
                 window.myChart.update();
 
             } catch (error) {
-                console.error("Error:", error);
+                console.error("Error connecting to Google Sheet:", error);
                 document.getElementById("sync-time").innerText = "⚠️ Connection Error";
             }
         }
 
-        // دالة العدادات
+        // 🛠️ دالة الأنيميشن وحساب العملات
         function animateCurrency(element, targetValue) {
             if(!element) return;
             let startTimestamp = null;
@@ -284,6 +265,5 @@
             window.requestAnimationFrame(step);
         }
     </script>
-
 </body>
 </html>
