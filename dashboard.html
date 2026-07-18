@@ -1,127 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mocha Enterprise | Financial Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-    <div class="bg-overlay"></div>
-
-    <div class="dashboard-container">
-        
-        <header class="dash-header">
-            <div class="brand">
-                <i class="fa-solid fa-crown gold-text"></i>
-                <div class="brand-text">
-                    <h2>MOCHA HUB</h2>
-                    <span id="last-update">🔄 System Initializing...</span>
-                </div>
-            </div>
-            <div class="header-actions">
-                <div class="notification-bell">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="bell-dot"></span>
-                </div>
-                <button onclick="handleLogout()" class="btn-logout">
-                    <i class="fa-solid fa-power-off"></i>
-                </button>
-            </div>
-        </header>
-
-        <section class="metrics-grid">
-            
-            <div class="metric-card premium-glow">
-                <div class="card-icon"><i class="fa-solid fa-chart-line-up"></i></div>
-                <div class="card-info">
-                    <h3>Total Profits</h3>
-                    <p class="counter" id="total-profits">€0.00</p>
-                </div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-icon success"><i class="fa-solid fa-wallet"></i></div>
-                <div class="card-info">
-                    <h3>Revenues</h3>
-                    <p class="counter" id="revenues">€0.00</p>
-                </div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-icon danger"><i class="fa-solid fa-receipt"></i></div>
-                <div class="card-info">
-                    <h3>Expenses</h3>
-                    <p class="counter" id="expenses">€0.00</p>
-                </div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-icon info"><i class="fa-solid fa-users"></i></div>
-                <div class="card-info">
-                    <h3>Investors</h3>
-                    <p class="counter-pure" id="investors-count">0</p>
-                </div>
-            </div>
-
-            <div class="metric-card share-value-card">
-                <div class="card-icon gold"><i class="fa-solid fa-gem"></i></div>
-                <div class="card-info">
-                    <h3>Share Value</h3>
-                    <p class="counter" id="share-value">€0.00</p>
-                </div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-icon"><i class="fa-solid fa-calendar-week"></i></div>
-                <div class="card-info">
-                    <h3>Weekly Profit</h3>
-                    <p class="counter" id="weekly-profit">€0.00</p>
-                </div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                <div class="card-info">
-                    <h3>Monthly Profit</h3>
-                    <p class="counter" id="monthly-profit">€0.00</p>
-                </div>
-            </div>
-
-            <div class="metric-card timestamp-card">
-                <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
-                <div class="card-info">
-                    <h3>Sync Status</h3>
-                    <p id="sync-time">Fetching Data...</p>
-                </div>
-            </div>
-
-            <div class="metric-card alert-card">
-                <div class="card-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
-                <div class="card-info">
-                    <h3>System Alert</h3>
-                    <p id="system-alert">Live Dynamic Tracking Active.</p>
-                </div>
-            </div>
-
-        </section>
-
-        <section class="chart-container">
-            <div class="chart-header">
-                <h3><i class="fa-solid fa-chart-area gold-text"></i> Fund Performance Growth</h3>
-                <span class="badge">Live Analytics</span>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="performanceChart"></canvas>
-            </div>
-        </section>
-
-    </div>
-
+    <!-- ⬇️ النسخة النهائية والمطورة لقراءة البيانات وتجنب الأصفار ⬇️ -->
     <script>
         // 1. حماية البوابة وتحقق تسجيل الدخول
         if (localStorage.getItem('mocha_auth') !== 'true') {
@@ -136,7 +13,7 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/export?format=csv&gid=1116639595";
 
         document.addEventListener("DOMContentLoaded", () => {
-            // 2. بناء الشارت الذهبي الفارغ مبدئياً لحين جلب البيانات
+            // 2. بناء الشارت الذهبي
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const goldGradient = ctx.createLinearGradient(0, 0, 0, 300);
             goldGradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
@@ -172,35 +49,40 @@
             fetchLiveSheetData();
         });
 
-        // 4. الدالة الذكية لقراءة السطور وفصل الأعمدة بالفاصلة العادية والمنقوطة
+        // دالة تنظيف واستخراج الأرقام بذكاء لمنع الأصفار
+        function cleanNumber(str) {
+            if (!str) return 0;
+            // تنظيف الاسترنج من علامات التنصيص والمسافات
+            let cleanStr = str.replace(/"/g, '').trim();
+            // استخراج الأرقام والنقاط العشرية والعلامة السالبة فقط
+            cleanStr = cleanStr.replace(/[^0-9.-]/g, '');
+            let num = parseFloat(cleanStr);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // 4. الدالة الذكية والمطورة لقراءة السطور وفصل الأعمدة
         async function fetchLiveSheetData() {
             try {
-                // إضافة timestamp في نهاية الرابط لإجبار المتصفح على كسر الكاش تماماً
                 const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime());
                 const dataText = await response.text();
                 
-                const lines = dataText.split("\n");
+                // تقسيم السطور مع مراعاة السطور الفارغة
+                const lines = dataText.split(/\r?\n/);
                 
                 let totalRevenues = 0;
                 let totalExpenses = 0;
 
-                // اللف على كل السطور (نتخطى السطر الأول لأنه سطر العناوين)
+                // اللف على كل السطور (نتخطى السطر الأول لأنه سطر العناوين Date, ايرادات...)
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
                     
-                    // فحص إذا كان السطر مقسم بـ فاصلة منقوطة ; أو فاصلة عادية ,
+                    // فحص ودعم كل أنواع الفواصل (عادية أو منقوطة)
                     const row = lines[i].includes(';') ? lines[i].split(';') : lines[i].split(',');
                     
                     if (row && row.length >= 3) {
-                        // تنظيف البيانات من أي علامات تنصيص زائدة أو مسافات
-                        let revStr = row[1] ? row[1].replace(/"/g, '').trim() : "";
-                        let expStr = row[2] ? row[2].replace(/"/g, '').trim() : "";
-                        
-                        let revVal = parseFloat(revStr);
-                        let expVal = parseFloat(expStr);
-
-                        if (!isNaN(revVal)) totalRevenues += revVal;
-                        if (!isNaN(expVal)) totalExpenses += expVal;
+                        // العمود الثاني [1] هو الإيرادات، العمود الثالث [2] هو المصروفات
+                        totalRevenues += cleanNumber(row[1]);
+                        totalExpenses += cleanNumber(row[2]);
                     }
                 }
 
@@ -208,7 +90,7 @@
                 const totalProfits = totalRevenues - totalExpenses;
                 const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
                 
-                // تشغيل الأنيميشن بالأرقام الفعلية القادمة من جدولك
+                // تشغيل الأنيميشن بالأرقام الفعلية المجمعة
                 animateCurrency(document.getElementById("total-profits"), totalProfits);
                 animateCurrency(document.getElementById("revenues"), totalRevenues);
                 animateCurrency(document.getElementById("expenses"), totalExpenses);
@@ -265,5 +147,3 @@
             window.requestAnimationFrame(step);
         }
     </script>
-</body>
-</html>
