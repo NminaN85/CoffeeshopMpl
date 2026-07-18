@@ -104,7 +104,7 @@
                 <div class="card-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
                 <div class="card-info">
                     <h3>System Alert</h3>
-                    <p id="system-alert">Live Dynamic Tracking Active.</p>
+                    <p id="system-alert">HTML Web Scraping Engine Active.</p>
                 </div>
             </div>
 
@@ -122,7 +122,6 @@
 
     </div>
 
-        <!-- ⬇️ النسخة النهائية والمطورة لقراءة البيانات وتجنب الأصفار ⬇️ -->
     <script>
         // 1. حماية البوابة وتحقق تسجيل الدخول
         if (localStorage.getItem('mocha_auth') !== 'true') {
@@ -133,145 +132,12 @@
             window.location.href = 'index.html';
         }
 
-        // 🔗 رابط تصدير شيت حساباتك (Sheet2) مباشر كـ CSV للتحايل على حماية جوجل
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/pubhtml";
-
+        // 🔗 رابط العرض العام المباشر للشيت الخاص بك (يتخطى مشاكل الـ gid والـ CSV للموبايل)
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/pubhtml";
 
         document.addEventListener("DOMContentLoaded", () => {
-            // 2. بناء الشارت الذهبي
+            // 2. بناء الشارت الذهبي الفارغ مبدئياً
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const goldGradient = ctx.createLinearGradient(0, 0, 0, 300);
             goldGradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
-            goldGradient.addColorStop(1, 'rgba(212, 175, 55, 0.0)');
-
-            window.myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Fund Growth (€)',
-                        data: [0, 0, 0, 0, 0, 0, 0],
-                        borderColor: '#d4af37',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#d4af37',
-                        backgroundColor: goldGradient,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#a1a1a6' } },
-                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#a1a1a6' } }
-                    }
-                }
-            });
-
-            // 3. جلب بيانات جدولك فوراً وحسابها
-            fetchLiveSheetData();
-        });
-
-        // دالة تنظيف واستخراج الأرقام بذكاء لمنع الأصفار
-        function cleanNumber(str) {
-            if (!str) return 0;
-            // تنظيف الاسترنج من علامات التنصيص والمسافات
-            let cleanStr = str.replace(/"/g, '').trim();
-            // استخراج الأرقام والنقاط العشرية والعلامة السالبة فقط
-            cleanStr = cleanStr.replace(/[^0-9.-]/g, '');
-            let num = parseFloat(cleanStr);
-            return isNaN(num) ? 0 : num;
-        }
-
-        // 4. الدالة الذكية والمطورة لقراءة السطور وفصل الأعمدة
-        async function fetchLiveSheetData() {
-            try {
-                const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime());
-                const dataText = await response.text();
-                
-                // تقسيم السطور مع مراعاة السطور الفارغة
-                const lines = dataText.split(/\r?\n/);
-                
-                let totalRevenues = 0;
-                let totalExpenses = 0;
-
-                // اللف على كل السطور (نتخطى السطر الأول لأنه سطر العناوين Date, ايرادات...)
-                for (let i = 1; i < lines.length; i++) {
-                    if (!lines[i].trim()) continue;
-                    
-                    // فحص ودعم كل أنواع الفواصل (عادية أو منقوطة)
-                    const row = lines[i].includes(';') ? lines[i].split(';') : lines[i].split(',');
-                    
-                    if (row && row.length >= 3) {
-                        // العمود الثاني [1] هو الإيرادات، العمود الثالث [2] هو المصروفات
-                        totalRevenues += cleanNumber(row[1]);
-                        totalExpenses += cleanNumber(row[2]);
-                    }
-                }
-
-                // حساب صافي الأرباح
-                const totalProfits = totalRevenues - totalExpenses;
-                const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-                
-                // تشغيل الأنيميشن بالأرقام الفعلية المجمعة
-                animateCurrency(document.getElementById("total-profits"), totalProfits);
-                animateCurrency(document.getElementById("revenues"), totalRevenues);
-                animateCurrency(document.getElementById("expenses"), totalExpenses);
-                animateCurrency(document.getElementById("share-value"), 1.25);
-                animateCurrency(document.getElementById("weekly-profit"), totalProfits);
-                animateCurrency(document.getElementById("monthly-profit"), totalProfits);
-                animateValue(document.getElementById("investors-count"), 0, 42, 1500);
-
-                document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
-                document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
-                
-                // تحديث رسمة الشارت تلقائياً بناءً على تصاعد الأرباح
-                window.myChart.data.datasets[0].data = [
-                    totalRevenues * 0.2, 
-                    totalRevenues * 0.4, 
-                    totalRevenues * 0.5, 
-                    totalRevenues * 0.7, 
-                    totalRevenues * 0.8, 
-                    totalRevenues * 0.9, 
-                    totalProfits
-                ];
-                window.myChart.update();
-
-            } catch (error) {
-                console.error("Error connecting to Google Sheet:", error);
-                document.getElementById("sync-time").innerText = "⚠️ Connection Error";
-            }
-        }
-
-        // 🛠️ دالة الأنيميشن وحساب العملات
-        function animateCurrency(element, targetValue) {
-            if(!element) return;
-            let startTimestamp = null;
-            const duration = 1500;
-            function step(timestamp) {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const currentValue = progress * targetValue;
-                element.innerText = "€" + currentValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-                if (progress < 1) window.requestAnimationFrame(step);
-            }
-            window.requestAnimationFrame(step);
-        }
-
-        function animateValue(obj, start, end, duration) {
-            if(!obj) return;
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) window.requestAnimationFrame(step);
-            };
-            window.requestAnimationFrame(step);
-        }
-    </script>
-
-</body>
-</html>
+            goldGradient.addColorStop(1, 'rgba(212, 175
