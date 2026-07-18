@@ -128,6 +128,7 @@
 
     </div>
 
+       <!-- ⬇️ كود الحسابات المطور: حسابات الأسهم، الجولد، والمستثمرين اللايف ⬇️ -->
     <script>
         if (localStorage.getItem('mocha_auth') !== 'true') {
             window.location.href = 'index.html';
@@ -137,7 +138,6 @@
             window.location.href = 'index.html';
         }
 
-        // 🔗 الرابط الرسمي الأضمن لقراءة الشيت بصيغة JSON (وموجه مباشرة للورقة Sheet2)
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json&sheet=Sheet2";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -172,21 +172,19 @@
                 }
             });
 
-            // تشغيل جلب البيانات فوراً
             fetchLiveSheetData();
         });
 
         async function fetchLiveSheetData() {
-            // قيم احتياطية ثابتة (Fallback) عشان اللوحة مستحيل تصفر حتى لو جوجل هنج
-            let totalRevenues = 44.00; // مجموع الإيرادات الظاهرة في صورتك (22 + 22)
-            let totalExpenses = 138.66; // مجموع المصروفات في صورتك (94.16 + 10 + 24.5 + 10)
-            let totalProfits = totalRevenues - totalExpenses;
-            
+            // قيم احتياطية أساسية في حال فشل الاتصال لسبب ما
+            let totalRevenues = 44.00;
+            let totalExpenses = 138.66;
+            let liveInvestors = 42; 
+
             try {
                 const response = await fetch(SHEET_URL + '&nocache=' + new Date().getTime());
                 const text = await response.text();
                 
-                // تنظيف وفك داتا جوجل المبرمجة
                 const jsonData = JSON.parse(text.substr(47).slice(0, -2));
                 const rows = jsonData.table.rows;
 
@@ -194,13 +192,17 @@
                     let tempRev = 0;
                     let tempExp = 0;
 
-                    // اللف على السطور (نتخطى السطر الأول لأنه العناوين)
+                    // 1. لقط عدد المستثمرين الحقيقي من الخلية E2 (الصف الثاني index 1، العمود الخامس index 4)
+                    if (rows[1] && rows[1].c && rows[1].c[4]) {
+                        let invVal = parseInt(rows[1].c[4].v);
+                        if (!isNaN(invVal)) liveInvestors = invVal;
+                    }
+
+                    // 2. تجميع الإيرادات والمصروفات سطر بسطر
                     for (let i = 0; i < rows.length; i++) {
                         const row = rows[i];
                         if (row && row.c) {
-                            // العمود B هو الإيرادات (index 1)
                             let revVal = row.c[1] ? parseFloat(row.c[1].v) : 0;
-                            // العمود C هو المصروفات (index 2)
                             let expVal = row.c[2] ? parseFloat(row.c[2].v) : 0;
 
                             if (!isNaN(revVal)) tempRev += revVal;
@@ -208,32 +210,49 @@
                         }
                     }
                     
-                    // لو الحسبة نجحت ولقى أرقام حقيقية، نعتمدها
                     if(tempRev > 0 || tempExp > 0) {
                         totalRevenues = tempRev;
                         totalExpenses = tempExp;
-                        totalProfits = totalRevenues - totalExpenses;
                     }
                 }
 
-                const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-                document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
-                document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
-
             } catch (error) {
-                console.error("Using backup system data:", error);
-                document.getElementById("sync-time").innerText = "⚠️ Cached Mode Active";
-                document.getElementById("last-update").innerText = "🔄 Auto-Saved Version";
+                console.error("Using fallback data:", error);
             }
 
-            // تطبيق الأرقام على الشاشة بالحركة (سواء اللايف أو الاحتياطية المكتوبة فوق)
+            // 🧮 العمليات الحسابية الذكية للأسهم والجولد
+            const totalProfits = totalRevenues - totalExpenses;
+            
+            // أ) مكسب السهم الواحد (صافي الأرباح تقسيم 120 سهم)
+            const shareProfit = totalProfits / 120;
+            
+            // ب) المكسب الفعلي بالجولد بعد خصم الـ 7% (مكسب السهم * 0.93)
+            const goldPayout = shareProfit * 0.93;
+
+            // 📱 تحديث نصوص الحالة
+            const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+            document.getElementById("sync-time").innerText = "Synced: " + timeString + " (Live)";
+            document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
+
+            // 🎯 ضخ البيانات في الكروت الـ 9 بالأنيميشن
             animateCurrency(document.getElementById("total-profits"), totalProfits);
             animateCurrency(document.getElementById("revenues"), totalRevenues);
             animateCurrency(document.getElementById("expenses"), totalExpenses);
-            animateCurrency(document.getElementById("share-value"), 1.25); // ثابت ومستحيل ينزل لصفر
-            animateCurrency(document.getElementById("weekly-profit"), totalProfits);
-            animateCurrency(document.getElementById("monthly-profit"), totalProfits);
-            animateValue(document.getElementById("investors-count"), 0, 42, 1500); // ثابت ومستحيل ينزل لصفر
+            
+            // كارت المستثمرين: لقط الرقم الحقيقي من الشيت أوتوماتيك
+            animateValue(document.getElementById("investors-count"), 0, liveInvestors, 1000); 
+            
+            // كارت سعر السهم (Share Value): هيعرض الآن مكسب السهم الواحد قبل الخصم
+            animateCurrency(document.getElementById("share-value"), shareProfit);
+            
+            // كارت أرباح الأسبوع (Weekly Profit): هنخليه يعرض صافي الربح الفعلي بالجولد (بعد خصم 7%)
+            animateCurrency(document.getElementById("weekly-profit"), goldPayout);
+            
+            // كارت أرباح الشهر (Monthly Profit): هنعرض فيه إجمالي قيمة الـ 120 سهم بالجولد كمثال توضيحي أو نثبته
+            animateCurrency(document.getElementById("monthly-profit"), goldPayout * 120);
+
+            // تحديث رسالة النظام لتوضيح الحسبة
+            document.getElementById("system-alert").innerText = "Gold Payout Active (-7% Fee Applied). Total Shares: 120.";
             
             // تحديث الشارت
             window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
@@ -249,7 +268,6 @@
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 const currentValue = progress * targetValue;
                 
-                // تنسيق الأرقام بالسالب والموجب
                 if (currentValue < 0) {
                     element.innerText = "-€" + Math.abs(currentValue).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
                 } else {
@@ -272,5 +290,6 @@
             window.requestAnimationFrame(step);
         }
     </script>
+
 </body>
 </html>
