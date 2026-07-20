@@ -291,8 +291,6 @@
 
     <script>
         const SPREADSHEET_BASE = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
-        
-        // 🔐 إعدادات قاعدة البيانات السحابية الحية لـ JSONBin (تم تصحيح علامة $ الزائدة هنا)
         const BIN_ID = "6a5e2be9da38895dfe766827";
         const MASTER_KEY = "$2a$10$HiNNr6inK3jh2WDUwy7uRuxjWlQxU9p/RocZHrXf7d0k3R8q0FH.G"; 
 
@@ -327,55 +325,87 @@
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 const rows = json.table.rows;
                 let rev = 0, exp = 0, cLabels = [], cData = [], bal = 0;
+                
                 rows.forEach(r => {
                     if(r && r.c) {
                         let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
                         let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
                         let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-                        if(rV > 0) { rev += rV; bal += rV; cLabels.push(d); cData.push(bal); }
-                        if(eV > 0) { exp += eV; bal -= eV; cLabels.push(d); cData.push(bal); }
+                        
+                        // احتساب الإيراد أو المصروف وتحديث المحفظة بشكل تراكمي
+                        if(rV > 0 || eV > 0) {
+                            rev += rV;
+                            exp += eV;
+                            bal += (rV - eV);
+                            cLabels.push(d);
+                            cData.push(bal);
+                        }
                     }
                 });
-                const profits = rev - exp; const sp = profits / 120;
+                
+                const profits = rev - exp; 
+                const sp = profits / 120;
+                
                 document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
                 document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
                 document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
                 document.getElementById('share-profit').innerText = sp.toFixed(2) + " GLD";
-                window.myChart.data.labels = cLabels; window.myChart.data.datasets[0].data = cData; window.myChart.update();
+                
+                // تحديث الـ Est. Profit للمستثمر في بورتال الخاص بيه
+                if(localStorage.getItem('user_role') === 'investor') {
+                    const userShares = parseFloat(localStorage.getItem('investor_shares') || 0);
+                    document.getElementById('portal-est-profit').innerText = (sp * userShares).toFixed(2) + " GLD";
+                }
+
+                window.myChart.data.labels = cLabels; 
+                window.myChart.data.datasets[0].data = cData; 
+                window.myChart.update();
             } catch(e){}
         }
 
         async function loadArchiveTransactions() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                allTxRows = json.table.rows || []; renderTxPage(1);
+                allTxRows = json.table.rows || []; 
+                renderTxPage(1);
             } catch(e){}
         }
 
         function renderTxPage(page) {
-            const sliced = allTxRows.slice(0, 20);
             let html = "";
-            sliced.forEach(r => {
+            allTxRows.forEach(r => {
                 if(r && r.c) {
                     let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
                     let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                    let ev = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
                     let desc = r.c[3] ? r.c[3].v : "";
-                    if(rv > 0) html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv}</span></td></tr>`;
+                    
+                    // 🛠️ التعديل هنا: يقرأ الإيراد والمصروف معاً ويعرض شارة خضراء وحمراء بناءً على النوع
+                    if(rv > 0) {
+                        html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`;
+                    } else if(ev > 0) {
+                        html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`;
+                    }
                 }
             });
-            document.getElementById('archive-tx-body').innerHTML = html;
+            document.getElementById('archive-tx-body').innerHTML = html || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
         }
 
         async function loadShareholders() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let h = "";
                 json.table.rows.forEach((r,i) => {
-                    if(i>0 && r.c && r.c[0]) h += `<tr><td>${r.c[0].v}</td><td>${r.c[1].v}</td><td><span class="gold-text">${((r.c[1].v/120)*100).toFixed(1)}%</span></td></tr>`;
+                    // الكود يقرأ جميع المستثمرين من الجدول بشكل صحيح مع حساب نسب التوزيع الحقيقية
+                    if(i > 0 && r.c && r.c[0]) {
+                        const name = r.c[0].v;
+                        const shares = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                        h += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
+                    }
                 });
                 document.getElementById('sh-table-body').innerHTML = h;
             } catch(e){}
