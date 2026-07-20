@@ -100,7 +100,6 @@
     </div>
 
     <div class="main-content">
-        <!-- Dashboard -->
         <div id="page-dashboard" class="page-section active">
             <div class="section-header"><h2>Dashboard</h2><p>Live portfolio overview performance</p></div>
             <div class="metrics-grid">
@@ -112,30 +111,26 @@
             <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         </div>
 
-        <!-- Transactions -->
         <div id="page-transactions" class="page-section">
             <div class="section-header"><h2>Transactions Archive</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead><tbody id="archive-tx-body"></tbody></table></div>
         </div>
 
-        <!-- Shareholders -->
         <div id="page-shareholders" class="page-section">
             <div class="section-header"><h2>Shareholders Ledger</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
         </div>
 
-        <!-- Market -->
         <div id="page-market" class="page-section">
             <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
                 <table class="custom-table">
-                    <thead><tr><th>Seller Name</th><th>Available</th><th>Price/Share</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr></thead>
                     <tbody id="market-table-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Portal -->
         <div id="page-my-portal" class="page-section">
             <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
             <div class="metrics-grid">
@@ -150,7 +145,6 @@
             </div>
         </div>
 
-        <!-- Admin Approvals Panel -->
         <div id="page-admin-panel" class="page-section">
             <div class="section-header"><h2>Admin Control Panel</h2><p>Review requests, update your Google Sheet manually, then confirm here</p></div>
             <div class="table-wrapper">
@@ -173,11 +167,12 @@
             if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
             const role = localStorage.getItem('user_role');
+            // التأكد من إظهار بوابات المستثمر بناءً على وجود اسم مسجل أو دور مستثمر
             if(role === 'investor' || localStorage.getItem('investor_name')) {
                 const item = document.getElementById('investor-menu-item');
                 if(item) item.style.display = 'flex';
                 
-                const ownerName = localStorage.getItem('investor_name'] || "Investor";
+                const ownerName = localStorage.getItem('investor_name') || "Investor";
                 const ownerShares = localStorage.getItem('investor_shares') || "0";
                 
                 if(document.getElementById('portal-owner-name')) document.getElementById('portal-owner-name').innerText = ownerName;
@@ -325,6 +320,7 @@
             } catch(e){ }
         }
 
+        // 🛑 التعديل تم هنا فقط بناءً على طلبك
         async function initiatePurchase(index) {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
@@ -355,7 +351,7 @@
 
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
-                listings[index].shares = buyCount; // تحديث العدد المطلوب شراؤه
+                listings[index].shares = buyCount;
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
