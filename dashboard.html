@@ -266,7 +266,6 @@
                     }
                 });
                 
-                // العكس لعرض الأحدث أولاً (Newest First)
                 rowsData.reverse();
                 
                 const body = document.getElementById('archive-tx-body');
@@ -295,7 +294,7 @@
 
         async function loadMarketListings() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
@@ -351,13 +350,11 @@
                 const buyerMPL = prompt("Enter your MPL Username (the account you transferred from):");
                 if (!buyerMPL) return alert("Purchase cancelled because MPL Username was not provided.");
 
-                // تحديث العرض في حال الشراء الجزئي (إبقاء المتبقي في الماركت وإرسال المطلوب لـ pending)
                 const remainingShares = maxAvailable - buyCount;
                 
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
-                listings[index].shares = buyCount; // الكمية المطلوبة المعلقة للأدمن
-                listings[index].originalIndex = index;
+                listings[index].shares = buyCount;
                 listings[index].remainingShares = remainingShares;
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
@@ -373,7 +370,7 @@
 
         async function loadAdminPanel() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
@@ -409,13 +406,20 @@
             }
 
             try {
+                // جلب أحدث بيانات فورية لضمان تطابق الـ Index تماماً قبل التعديل
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const currentData = await res.json();
                 let listings = currentData.record || [];
                 const item = listings[index];
 
+                if (!item) {
+                    alert("Error: Item not found.");
+                    loadAdminPanel();
+                    return;
+                }
+
                 if(action === 'approve' || action === 'remove') {
-                    // إذا كان هناك متبقي من الشراء الجزئي، نقوم بإنشاء عنصر جديد active بالمتبقي وإزالة الطلب المعلق
+                    // إذا كان هناك متبقي من الشراء الجزئي، نضيفه كـ active جديد في الماركت
                     if (item.remainingShares && item.remainingShares > 0 && action === 'approve') {
                         listings.push({
                             seller: item.seller,
@@ -424,26 +428,30 @@
                             status: "active"
                         });
                     }
+                    // حذف الطلب المعلق تماماً من الـ Array
                     listings.splice(index, 1);
-                    alert("Operation completed successfully.");
                 } else if(action === 'reject') {
-                    // إعادة الكمية الأصلية أو دمجها في الماركت
+                    // إعادة الأسهم المتبقية والمباعة لنفس العرض وإرجاعه للماركت
                     let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
                     listings[index].shares = restoredShares;
                     listings[index].status = "active";
                     delete listings[index].buyer;
                     delete listings[index].remainingShares;
-                    delete listings[index].originalIndex;
-                    alert("Request rejected and shares returned to market.");
                 }
 
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                // رفع التحديث للسرفر بصورة مؤكدة
+                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(listings)
                 });
 
-                loadAdminPanel();
+                if(updateRes.ok) {
+                    alert(action === 'reject' ? "Request rejected and shares returned to market." : "Approved and cleared successfully.");
+                    loadAdminPanel(); // إعادة تحميل الجدول فوراً ليختفي السطر
+                } else {
+                    alert("Failed to sync with database.");
+                }
             } catch(e) { alert("Error handling admin operation."); }
         }
 
