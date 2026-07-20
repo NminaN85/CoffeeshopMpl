@@ -452,23 +452,37 @@
             } catch(e) { alert("Error."); }
         }
 
+        // تم ضبط هذه الدالة بشكل مباشر لتعديل وحذف السطر من JSONBin فوراً دون أي شروط معقدة
         async function removeAdmin(index) {
             if(!confirm("Are you sure you want to remove this row completely?")) return;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                let listings = (await res.json()).record || [];
+                const jsonRes = await res.json();
+                let listings = jsonRes.record || [];
                 
-                listings.splice(index, 1);
+                // التأكد من أن العنصر موجود قبل حذفه
+                if (listings[index]) {
+                    listings.splice(index, 1);
 
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-                    body: JSON.stringify(listings)
-                });
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                        body: JSON.stringify(listings)
+                    });
 
-                alert("Removed successfully.");
-                loadAdminPanel();
-            } catch(e) { alert("Error."); }
+                    if (updateRes.ok) {
+                        alert("Removed successfully from database.");
+                        loadAdminPanel(); // إعادة تحميل الجدول فوراً
+                    } else {
+                        alert("Failed to update database.");
+                    }
+                } else {
+                    alert("Index not found in database.");
+                }
+            } catch(e) { 
+                console.error(e);
+                alert("Network or Server Error."); 
+            }
         }
 
         async function deleteMarketListing(index) {
