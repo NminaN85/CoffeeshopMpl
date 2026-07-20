@@ -384,9 +384,9 @@
                             <td>${item.shares} Units</td>
                             <td>${total.toLocaleString()} GLD</td>
                             <td>
-                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'approve')">Approve</button>
-                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
-                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="processAdminDecision(${index}, 'remove')">Remove / Done</button>
+                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="approveAdmin(${index})">Approve</button>
+                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="rejectAdmin(${index})">Reject</button>
+                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="removeAdmin(${index})">Remove / Done</button>
                             </td>
                         </tr>`;
                     }
@@ -396,31 +396,15 @@
             } catch(e){}
         }
 
-        async function processAdminDecision(index, action) {
-            if(action === 'approve') {
-                if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
-            } else if(action === 'reject') {
-                if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
-            } else if(action === 'remove') {
-                if(!confirm("Are you sure you want to remove this row completely?")) return;
-            }
-
+        async function approveAdmin(index) {
+            if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
             try {
-                // جلب أحدث بيانات فورية لضمان تطابق الـ Index تماماً قبل التعديل
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                const currentData = await res.json();
-                let listings = currentData.record || [];
-                const item = listings[index];
+                let listings = (await res.json()).record || [];
+                let item = listings[index];
 
-                if (!item) {
-                    alert("Error: Item not found.");
-                    loadAdminPanel();
-                    return;
-                }
-
-                if(action === 'approve' || action === 'remove') {
-                    // إذا كان هناك متبقي من الشراء الجزئي، نضيفه كـ active جديد في الماركت
-                    if (item.remainingShares && item.remainingShares > 0 && action === 'approve') {
+                if(item) {
+                    if (item.remainingShares && item.remainingShares > 0) {
                         listings.push({
                             seller: item.seller,
                             shares: item.remainingShares,
@@ -428,31 +412,63 @@
                             status: "active"
                         });
                     }
-                    // حذف الطلب المعلق تماماً من الـ Array
                     listings.splice(index, 1);
-                } else if(action === 'reject') {
-                    // إعادة الأسهم المتبقية والمباعة لنفس العرض وإرجاعه للماركت
+                    
+                    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                        body: JSON.stringify(listings)
+                    });
+                    
+                    alert("Approved and cleared successfully.");
+                    loadAdminPanel();
+                }
+            } catch(e) { alert("Error."); }
+        }
+
+        async function rejectAdmin(index) {
+            if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                let item = listings[index];
+
+                if(item) {
                     let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
                     listings[index].shares = restoredShares;
                     listings[index].status = "active";
                     delete listings[index].buyer;
                     delete listings[index].remainingShares;
-                }
 
-                // رفع التحديث للسرفر بصورة مؤكدة
-                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                        body: JSON.stringify(listings)
+                    });
+
+                    alert("Request rejected and shares returned to market.");
+                    loadAdminPanel();
+                }
+            } catch(e) { alert("Error."); }
+        }
+
+        async function removeAdmin(index) {
+            if(!confirm("Are you sure you want to remove this row completely?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                
+                listings.splice(index, 1);
+
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(listings)
                 });
 
-                if(updateRes.ok) {
-                    alert(action === 'reject' ? "Request rejected and shares returned to market." : "Approved and cleared successfully.");
-                    loadAdminPanel(); // إعادة تحميل الجدول فوراً ليختفي السطر
-                } else {
-                    alert("Failed to sync with database.");
-                }
-            } catch(e) { alert("Error handling admin operation."); }
+                alert("Removed successfully.");
+                loadAdminPanel();
+            } catch(e) { alert("Error."); }
         }
 
         async function deleteMarketListing(index) {
