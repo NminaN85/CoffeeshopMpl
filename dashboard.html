@@ -206,21 +206,23 @@
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let rev = 0, exp = 0, cLabels = [], cData = [], bal = 0;
                 
-                json.table.rows.forEach(r => {
-                    if(r && r.c) {
-                        let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
-                        let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
-                        let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-                        
-                        if(rV > 0 || eV > 0) {
-                            rev += rV;
-                            exp += eV;
-                            bal += (rV - eV);
-                            cLabels.push(d);
-                            cData.push(bal);
+                if(json.table && json.table.rows) {
+                    json.table.rows.forEach(r => {
+                        if(r && r.c) {
+                            let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
+                            let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                            let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
+                            
+                            if(rV > 0 || eV > 0) {
+                                rev += rV;
+                                exp += eV;
+                                bal += (rV - eV);
+                                cLabels.push(d);
+                                cData.push(bal);
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 
                 const profits = rev - exp;
                 const sp = profits / 120;
@@ -241,7 +243,7 @@
                     window.myChart.data.datasets[0].data = cData; 
                     window.myChart.update();
                 }
-            } catch(e){}
+            } catch(e){ console.error(e); }
         }
 
         async function loadArchiveTransactions() {
@@ -251,20 +253,22 @@
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let rowsData = [];
                 
-                json.table.rows.forEach(r => {
-                    if(r && r.c) {
-                        let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
-                        let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
-                        let ev = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-                        let desc = r.c[3] ? r.c[3].v : "";
-                        
-                        if(rv > 0) {
-                            rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`);
-                        } else if(ev > 0) {
-                            rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`);
+                if(json.table && json.table.rows) {
+                    json.table.rows.forEach(r => {
+                        if(r && r.c) {
+                            let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
+                            let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                            let ev = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
+                            let desc = r.c[3] ? r.c[3].v : "";
+                            
+                            if(rv > 0) {
+                                rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`);
+                            } else if(ev > 0) {
+                                rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`);
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 
                 rowsData.reverse();
                 
@@ -280,14 +284,15 @@
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let h = "";
                 
-                json.table.rows.forEach((r,i) => {
-                    indexVal = i;
-                    if(i > 0 && r.c && r.c[0]) {
-                        const name = r.c[0].v;
-                        const shares = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
-                        h += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
-                    }
-                });
+                if(json.table && json.table.rows) {
+                    json.table.rows.forEach((r,i) => {
+                        if(i > 0 && r.c && r.c[0]) {
+                            const name = r.c[0].v;
+                            const shares = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                            h += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
+                        }
+                    });
+                }
                 const body = document.getElementById('sh-table-body');
                 if(body) body.innerHTML = h;
             } catch(e){}
@@ -353,12 +358,10 @@
 
                 const remainingShares = maxAvailable - buyCount;
                 
-                // حفظ الـ index الحقيقي في عنصر الـ JSON نفسه لضمان دقة المعالجة في لوحة التحكم
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
                 listings[index].shares = buyCount;
                 listings[index].remainingShares = remainingShares;
-                listings[index].realIndex = index; // ربط مباشر بالعنصر الأصلي
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
@@ -381,18 +384,17 @@
                 listings.forEach((item, index) => {
                     if (item.status === "pending") {
                         const total = parseInt(item.shares) * parseInt(item.price);
-                        // بنمرر الـ index الحقيقي الموجود في الـ JSON لضمان عدم حدوث أي خطأ
-                        const targetIndex = (item.realIndex !== undefined) ? item.realIndex : index;
                         
+                        // تمرير معرّفات فريدة (البائع والمشتري) لتفادي أي خطأ في الـ Index تماماً
                         html += `<tr>
                             <td>${item.seller}</td>
                             <td><span class="gold-text">${item.buyer}</span></td>
                             <td>${item.shares} Units</td>
                             <td>${total.toLocaleString()} GLD</td>
                             <td>
-                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="approveAdmin(${targetIndex})">Approve</button>
-                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="rejectAdmin(${targetIndex})">Reject</button>
-                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="removeAdmin(${targetIndex})">Remove / Done</button>
+                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="approveAdmin('${item.seller}', '${item.buyer}')">Approve</button>
+                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="rejectAdmin('${item.seller}', '${item.buyer}')">Reject</button>
+                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="removeAdmin('${item.seller}', '${item.buyer}')">Remove / Done</button>
                             </td>
                         </tr>`;
                     }
@@ -402,14 +404,17 @@
             } catch(e){}
         }
 
-        async function approveAdmin(realIndex) {
+        // دالة الـ Approve الآمنة التي تبحث بالعنصر نفسه دون الـ Indexes
+        async function approveAdmin(seller, buyer) {
             if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 let listings = (await res.json()).record || [];
-                let item = listings[realIndex];
+                
+                const index = listings.findIndex(item => item.seller === seller && item.buyer === buyer && item.status === "pending");
 
-                if(item) {
+                if(index !== -1) {
+                    let item = listings[index];
                     if (item.remainingShares && item.remainingShares > 0) {
                         listings.push({
                             seller: item.seller,
@@ -418,7 +423,7 @@
                             status: "active"
                         });
                     }
-                    listings.splice(realIndex, 1);
+                    listings.splice(index, 1);
                     
                     const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                         method: "PUT",
@@ -432,46 +437,58 @@
                     } else {
                         alert("Failed to update database.");
                     }
+                } else {
+                    alert("Request not found in database.");
                 }
             } catch(e) { alert("Error connecting to server."); }
         }
 
-        async function rejectAdmin(realIndex) {
+        // دالة الـ Reject الآمنة
+        async function rejectAdmin(seller, buyer) {
             if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 let listings = (await res.json()).record || [];
-                let item = listings[realIndex];
+                
+                const index = listings.findIndex(item => item.seller === seller && item.buyer === buyer && item.status === "pending");
 
-                if(item) {
+                if(index !== -1) {
+                    let item = listings[index];
                     let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
-                    listings[realIndex].shares = restoredShares;
-                    listings[realIndex].status = "active";
-                    delete listings[realIndex].buyer;
-                    delete listings[realIndex].remainingShares;
-                    delete listings[realIndex].realIndex;
+                    listings[index].shares = restoredShares;
+                    listings[index].status = "active";
+                    delete listings[index].buyer;
+                    delete listings[index].remainingShares;
 
-                    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                         body: JSON.stringify(listings)
                     });
 
-                    alert("Request rejected and shares returned to market.");
-                    loadAdminPanel();
+                    if(updateRes.ok) {
+                        alert("Request rejected and shares returned to market.");
+                        loadAdminPanel();
+                    } else {
+                        alert("Failed to update database.");
+                    }
+                } else {
+                    alert("Request not found in database.");
                 }
             } catch(e) { alert("Error."); }
         }
 
-        async function removeAdmin(realIndex) {
+        // دالة الـ Remove الآمنة
+        async function removeAdmin(seller, buyer) {
             if(!confirm("Are you sure you want to remove this row completely?")) return;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                const jsonRes = await res.json();
-                let listings = jsonRes.record || [];
+                let listings = (await res.json()).record || [];
                 
-                if (listings[realIndex]) {
-                    listings.splice(realIndex, 1);
+                const index = listings.findIndex(item => item.seller === seller && item.buyer === buyer && item.status === "pending");
+
+                if (index !== -1) {
+                    listings.splice(index, 1);
 
                     const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                         method: "PUT",
@@ -486,7 +503,7 @@
                         alert("Failed to update database.");
                     }
                 } else {
-                    alert("Index not found in database.");
+                    alert("Request not found in database.");
                 }
             } catch(e) { 
                 console.error(e);
@@ -500,9 +517,20 @@
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 let listings = (await res.json()).record || [];
                 listings.splice(index, 1);
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
-                alert("Deleted."); loadMarketListings();
-            } catch(e){}
+                
+                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                    method: "PUT", 
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+                    body: JSON.stringify(listings) 
+                });
+
+                if(updateRes.ok) {
+                    alert("Deleted."); 
+                    loadMarketListings();
+                } else {
+                    alert("Failed to delete from database.");
+                }
+            } catch(e){ alert("Error connecting to server."); }
         }
 
         async function listSharesOnMarket() {
@@ -515,8 +543,21 @@
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 let listings = (await res.json()).record || [];
                 listings.push({ seller: localStorage.getItem('investor_name') || "Investor", shares: count, price: price, status: "active" });
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
-                alert("Published!"); document.getElementById('sell-count').value = ''; document.getElementById('sell-price').value = ''; switchPage('market');
+                
+                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                    method: "PUT", 
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+                    body: JSON.stringify(listings) 
+                });
+
+                if(updateRes.ok) {
+                    alert("Published!"); 
+                    document.getElementById('sell-count').value = ''; 
+                    document.getElementById('sell-price').value = ''; 
+                    switchPage('market');
+                } else {
+                    alert("Failed to publish listing.");
+                }
             } catch(err) { alert("Error."); } finally { if(btn) btn.disabled = false; }
         }
 
@@ -524,7 +565,7 @@
             const chartEl = document.getElementById('performanceChart');
             if(!chartEl) return;
             const ctx = chartEl.getContext('2d'); 
-            window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: type, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); 
+            window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); 
         }
         
         function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
