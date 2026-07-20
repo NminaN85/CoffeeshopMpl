@@ -18,120 +18,24 @@
             --border: rgba(212, 175, 55, 0.12);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow-x: hidden;
-        }
+        .mobile-header { display: flex; align-items: center; justify-content: space-between; background: var(--panel-bg); padding: 15px 20px; border-bottom: 1px solid var(--border); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+        .mobile-header .brand { font-size: 1.2rem; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+        .menu-toggle { background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
 
-        .mobile-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--panel-bg);
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-        }
+        .sidebar { width: 260px; background: var(--panel-bg); height: 100vh; position: fixed; top: 0; left: -260px; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 30px 20px; z-index: 2000; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .sidebar.active { transform: translateX(260px); }
+        .sidebar .brand { font-size: 1.4rem; font-weight: bold; color: var(--gold); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .sidebar menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .sidebar menu li { padding: 14px 16px; border-radius: 10px; cursor: pointer; transition: 0.3s ease; display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-weight: 500; }
+        .sidebar menu li.active, .sidebar menu li:hover { background: rgba(212, 175, 55, 0.08); color: var(--gold); }
 
-        .mobile-header .brand {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--gold);
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            color: var(--gold);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .sidebar {
-            width: 260px;
-            background: var(--panel-bg);
-            height: 100vh;
-            position: fixed;
-            top: 0; left: -260px;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 30px 20px;
-            z-index: 2000;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .sidebar.active {
-            transform: translateX(260px);
-        }
-
-        .sidebar .brand {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: var(--gold);
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sidebar menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sidebar menu li {
-            padding: 14px 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .sidebar menu li.active, .sidebar menu li:hover {
-            background: rgba(212, 175, 55, 0.08);
-            color: var(--gold);
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 1500;
-        }
-
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1500; }
         .sidebar-overlay.active { display: block; }
 
-        .main-content {
-            padding: 90px 20px 40px 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        .main-content { padding: 90px 20px 40px 20px; width: 100%; max-width: 1200px; margin: 0 auto; }
         .page-section { display: none; }
         .page-section.active { display: block; animation: fadeIn 0.4s ease-out; }
 
@@ -139,20 +43,8 @@
         .section-header h2 { font-size: 1.6rem; font-weight: 700; color: #fff; }
         .section-header p { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
 
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .metric-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 20px 15px;
-            border-radius: 16px;
-        }
-
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+        .metric-card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 20px 15px; border-radius: 16px; }
         .metric-card h3 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
         .metric-card p { font-size: 1.3rem; font-weight: 700; }
 
@@ -160,35 +52,20 @@
         .green-text { color: #30d158; }
         .red-text { color: #ff453a; }
 
-        .chart-container {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 20px;
-            border-radius: 20px;
-            height: 320px;
-            position: relative;
-        }
-
-        .table-wrapper {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-top: 15px;
-        }
-
+        .chart-container { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 20px; border-radius: 20px; height: 320px; position: relative; }
+        .table-wrapper { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; overflow: hidden; margin-top: 15px; }
+        
         .custom-table { width: 100%; border-collapse: collapse; }
         .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
         .custom-table th { background: rgba(212, 175, 55, 0.03); color: var(--gold); }
 
-        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; }
         .badge-rev { background: rgba(48, 209, 88, 0.15); color: #30d158; }
         .badge-exp { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
         .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: #fff; }
-        
         .btn-action { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
         @media (min-width: 992px) {
@@ -197,7 +74,6 @@
             .main-content { padding-left: 280px; padding-top: 40px; }
             .metrics-grid { grid-template-columns: repeat(4, 1fr); }
         }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -218,65 +94,70 @@
             <li onclick="switchPage('shareholders')"><i class="fa-solid fa-user-group"></i> Shareholders</li>
             <li onclick="switchPage('market')"><i class="fa-solid fa-shop"></i> Shares Market</li>
             <li id="investor-menu-item" style="display:none;" onclick="switchPage('my-portal')"><i class="fa-solid fa-user-shield"></i> My Portal</li>
+            <li id="admin-menu-item" style="display:none;" onclick="switchPage('admin-panel')"><i class="fa-solid fa-lock"></i> Admin Approvals</li>
             <li onclick="handleLogout()" style="margin-top:auto; color:#ff453a;"><i class="fa-solid fa-power-off"></i> Logout</li>
         </menu>
     </div>
 
     <div class="main-content">
+        <!-- Dashboard -->
         <div id="page-dashboard" class="page-section active">
-            <div class="section-header">
-                <h2 id="current-month-title">Dashboard</h2>
-                <p>Live portfolio overview performance</p>
-            </div>
+            <div class="section-header"><h2>Dashboard</h2><p>Live portfolio overview performance</p></div>
             <div class="metrics-grid">
                 <div class="metric-card"><h3>Net Profits</h3><p id="total-profits" class="gold-text">0.00</p></div>
                 <div class="metric-card"><h3>Revenues</h3><p id="green-text" class="green-text">0.00</p></div>
                 <div class="metric-card"><h3>Expenses</h3><p id="expenses" class="red-text">0.00</p></div>
                 <div class="metric-card"><h3>Per Share</h3><p id="share-profit">0.00</p></div>
             </div>
-            <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
-            </div>
+            <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         </div>
 
+        <!-- Transactions -->
         <div id="page-transactions" class="page-section">
             <div class="section-header"><h2>Transactions Archive</h2></div>
-            <div class="table-wrapper">
-                <table class="custom-table">
-                    <thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead>
-                    <tbody id="archive-tx-body"></tbody>
-                </table>
-            </div>
+            <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead><tbody id="archive-tx-body"></tbody></table></div>
         </div>
 
+        <!-- Shareholders -->
         <div id="page-shareholders" class="page-section">
             <div class="section-header"><h2>Shareholders Ledger</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
         </div>
 
+        <!-- Market -->
         <div id="page-market" class="page-section">
             <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
                 <table class="custom-table">
                     <thead><tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr></thead>
-                    <tbody id="market-table-body"><tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 30px;">Loading live market offers...</td></tr></tbody>
+                    <tbody id="market-table-body"></tbody>
                 </table>
             </div>
         </div>
 
+        <!-- Portal -->
         <div id="page-my-portal" class="page-section">
             <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
             <div class="metrics-grid">
                 <div class="metric-card"><h3>My Shares</h3><p id="portal-shares-count" class="gold-text">0</p></div>
                 <div class="metric-card"><h3>Est. Profit</h3><p id="portal-est-profit" class="green-text">0.00</p></div>
             </div>
-            <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Month Name</th><th>Status</th></tr></thead><tbody id="portal-history-body"></tbody></table></div>
-
             <h3 style="margin: 35px 0 15px 0; font-size: 1.2rem;"><i class="fa-solid fa-tags" style="color: var(--gold)"></i> List My Shares for Sale</h3>
             <div class="metric-card" style="max-width: 450px;">
                 <div class="form-group"><label>Volume:</label><input type="number" id="sell-count"></div>
                 <div class="form-group"><label>Price per Share:</label><input type="number" id="sell-price"></div>
                 <button id="btn-publish-listing" class="btn-action" onclick="listSharesOnMarket()">Publish Live Listing</button>
+            </div>
+        </div>
+
+        <!-- Admin Approvals Panel -->
+        <div id="page-admin-panel" class="page-section">
+            <div class="section-header"><h2>Admin Control Panel</h2><p>Review requests, update your Google Sheet manually, then confirm here</p></div>
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead><tr><th>Seller</th><th>Buyer (MPL)</th><th>Shares</th><th>Total Price</th><th>Actions</th></tr></thead>
+                    <tbody id="admin-table-body"><tr><td colspan="5" style="text-align:center; padding:20px;">No pending approvals.</td></tr></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -286,45 +167,28 @@
         const BIN_ID = "6a5e2be9da38895dfe766827";
         const MASTER_KEY = "$2a$10$HiNNr6inK3jh2WDUwy7uRuxjWlQxU9p/RocZHrXf7d0k3R8q0FH.G"; 
 
-        let allTxRows = [];
-
-        function toggleMenu() {
-            const menu = document.getElementById('sidebarMenu');
-            const overlay = document.getElementById('sidebarOverlay');
-            if(menu && overlay) {
-                menu.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
+        function toggleMenu() { document.getElementById('sidebarMenu').classList.toggle('active'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
 
         document.addEventListener("DOMContentLoaded", () => {
-            if(localStorage.getItem('mocha_auth') !== 'true') {
-                window.location.href = 'index.html';
-                return;
-            }
+            if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
-            if(localStorage.getItem('user_role') === 'investor') {
-                const item = document.getElementById('investor-menu-item');
-                const pName = document.getElementById('portal-owner-name');
-                const pShares = document.getElementById('portal-shares-count');
-                if(item) item.style.display = 'flex';
-                if(pName) pName.innerText = localStorage.getItem('investor_name') || "";
-                if(pShares) pShares.innerText = localStorage.getItem('investor_shares') || "0";
+            const role = localStorage.getItem('user_role');
+            if(role === 'investor') {
+                document.getElementById('investor-menu-item').style.display = 'flex';
+                document.getElementById('portal-owner-name').innerText = localStorage.getItem('investor_name');
+                document.getElementById('portal-shares-count').innerText = localStorage.getItem('investor_shares');
+            } else if (role === 'admin') {
+                document.getElementById('admin-menu-item').style.display = 'flex';
             }
-            
-            initChart(); 
-            loadCurrentMonthDashboard(); 
-            loadArchiveTransactions(); 
-            loadShareholders(); 
-            loadMarketListings();
+            initChart(); loadCurrentMonthDashboard(); loadArchiveTransactions(); loadShareholders(); loadMarketListings();
         });
 
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-            const targetPage = document.getElementById('page-' + pageId);
-            if(targetPage) targetPage.classList.add('active');
+            document.getElementById('page-' + pageId).classList.add('active');
             toggleMenu();
             if(pageId === 'market') loadMarketListings();
+            if(pageId === 'admin-panel') loadAdminPanel();
         }
 
         async function loadCurrentMonthDashboard() {
@@ -332,113 +196,71 @@
                 const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                const rows = json.table.rows;
                 let rev = 0, exp = 0, cLabels = [], cData = [], bal = 0;
-                
-                rows.forEach(r => {
+                json.table.rows.forEach(r => {
                     if(r && r.c) {
                         let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
                         let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
                         let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-                        
-                        if(rV > 0 || eV > 0) {
-                            rev += rV;
-                            exp += eV;
-                            bal += (rV - eV);
-                            cLabels.push(d);
-                            cData.push(bal);
-                        }
+                        if(rV > 0) { rev += rV; bal += rV; cLabels.push(d); cData.push(bal); }
+                        if(eV > 0) { exp += eV; bal -= eV; cLabels.push(d); cData.push(bal); }
                     }
                 });
-                
-                const profits = rev - exp; 
-                const sp = profits / 120;
-                
-                if(document.getElementById('total-profits')) document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
-                if(document.getElementById('green-text')) document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
-                if(document.getElementById('expenses')) document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
-                if(document.getElementById('share-profit')) document.getElementById('share-profit').innerText = sp.toFixed(2) + " GLD";
-                
-                const portalProfitEl = document.getElementById('portal-est-profit');
-                if(portalProfitEl && localStorage.getItem('user_role') === 'investor') {
-                    const userShares = parseFloat(localStorage.getItem('investor_shares') || 0);
-                    portalProfitEl.innerText = (sp * userShares).toFixed(2) + " GLD";
-                }
-
-                if(window.myChart && cLabels.length > 0) {
-                    window.myChart.data.labels = cLabels; 
-                    window.myChart.data.datasets[0].data = cData; 
-                    window.myChart.update();
-                }
-            } catch(e){ console.error(e); }
+                const profits = rev - exp;
+                document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
+                document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
+                document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
+                document.getElementById('share-profit').innerText = (profits / 120).toFixed(2) + " GLD";
+                window.myChart.data.labels = cLabels; window.myChart.data.datasets[0].data = cData; window.myChart.update();
+            } catch(e){}
         }
 
         async function loadArchiveTransactions() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                allTxRows = json.table.rows || []; 
-                renderTxPage();
-            } catch(e){ console.error(e); }
-        }
-
-        function renderTxPage() {
-            let html = "";
-            allTxRows.forEach(r => {
-                if(r && r.c) {
-                    let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
-                    let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
-                    let ev = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-                    let desc = r.c[3] ? r.c[3].v : "";
-                    
-                    if(rv > 0) {
-                        html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`;
-                    } else if(ev > 0) {
-                        html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`;
+                let html = "";
+                json.table.rows.slice(0, 20).forEach(r => {
+                    if(r && r.c) {
+                        let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
+                        let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                        let desc = r.c[3] ? r.c[3].v : "";
+                        if(rv > 0) html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv}</span></td></tr>`;
                     }
-                }
-            });
-            const body = document.getElementById('archive-tx-body');
-            if(body) body.innerHTML = html || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
+                });
+                document.getElementById('archive-tx-body').innerHTML = html;
+            } catch(e){}
         }
 
         async function loadShareholders() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors&nocache=${new Date().getTime()}`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let h = "";
                 json.table.rows.forEach((r,i) => {
-                    if(i > 0 && r.c && r.c[0]) {
-                        const name = r.c[0].v;
-                        const shares = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
-                        h += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
-                    }
+                    if(i>0 && r.c && r.c[0]) h += `<tr><td>${r.c[0].v}</td><td>${r.c[1].v}</td><td><span class="gold-text">${((r.c[1].v/120)*100).toFixed(1)}%</span></td></tr>`;
                 });
-                const body = document.getElementById('sh-table-body');
-                if(body) body.innerHTML = h;
-            } catch(e){ console.error(e); }
+                document.getElementById('sh-table-body').innerHTML = h;
+            } catch(e){}
         }
 
         async function loadMarketListings() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { "X-Master-Key": MASTER_KEY }
-                });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
-                
                 const currentUserName = localStorage.getItem('investor_name') || "";
 
                 listings.forEach((item, index) => {
-                    if (item.shares !== "0") {
+                    if (item.status === "active" || !item.status) {
                         let actionButton = "";
                         if(item.seller === currentUserName) {
                             actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing(${index})">Delete</button>`;
                         } else {
-                            actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;">Purchase</button>`;
+                            actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;" onclick="initiatePurchase(${index})">Purchase</button>`;
                         }
 
                         html += `<tr>
@@ -449,21 +271,21 @@
                         </tr>`;
                     }
                 });
-                const body = document.getElementById('market-table-body');
-                if(body) body.innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
-            } catch(e){
-                const body = document.getElementById('market-table-body');
-                if(body) body.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Database connection error.</td></tr>";
-            }
+                document.getElementById('market-table-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
+            } catch(e){ }
         }
 
-        async function deleteMarketListing(index) {
-            if(!confirm("Are you sure you want to delete this listing?")) return;
+        async function initiatePurchase(index) {
+            const buyerMPL = prompt("Please enter your MPL username to confirm transaction request:");
+            if (!buyerMPL) return alert("Purchase cancelled. MPL Username is required.");
+
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const currentData = await res.json();
                 let listings = currentData.record || [];
-                listings.splice(index, 1);
+
+                listings[index].status = "pending";
+                listings[index].buyer = buyerMPL;
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
@@ -471,58 +293,96 @@
                     body: JSON.stringify(listings)
                 });
 
-                alert("🗑️ Listing Deleted Successfully!");
+                alert("⏳ Request Sent! Awaiting Admin verification of the transaction.");
                 loadMarketListings();
-            } catch(err) {
-                alert("Error deleting listing.");
+            } catch(err) { alert("Error connecting to server."); }
+        }
+
+        async function loadAdminPanel() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const data = await res.json();
+                const listings = data.record || [];
+                let html = "";
+
+                listings.forEach((item, index) => {
+                    if (item.status === "pending") {
+                        const total = parseInt(item.shares) * parseInt(item.price);
+                        html += `<tr>
+                            <td>${item.seller}</td>
+                            <td><span class="gold-text">${item.buyer}</span></td>
+                            <td>${item.shares} Units</td>
+                            <td>${total.toLocaleString()} GLD</td>
+                            <td>
+                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'approve')">Approve (Done in Sheet)</button>
+                                <button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+                document.getElementById('admin-table-body').innerHTML = html || "<tr><td colspan='5' style='text-align:center; padding:20px;'>No pending approvals.</td></tr>";
+            } catch(e){}
+        }
+
+        async function processAdminDecision(index, action) {
+            if(action === 'approve') {
+                if(!confirm("تنبيه: اضغط موافق فقط إذا قمت بالفعل بتعديل ملف الـ Google Sheet يدوياً ونقل الأسهم! هل تريد مسح الطلب الآن؟")) return;
+            } else {
+                if(!confirm("هل أنت متأكد من رفض هذه العملية وإعادة العرض للماركت؟")) return;
             }
+
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const currentData = await res.json();
+                let listings = currentData.record || [];
+
+                if(action === 'approve') {
+                    // مسح العرض نهائياً من السوق والأدمن لأن الأدمن أكد أنه عدله يدوياً في الشيت
+                    listings.splice(index, 1);
+                    alert("✅ تم تأكيد النقل ومسح الطلب من السيستم بنجاح.");
+                } else {
+                    // الرفض يعيد العرض حراً في الماركت
+                    listings[index].status = "active";
+                    delete listings[index].buyer;
+                    alert("❌ تم رفض الطلب وإعادة الأسهم للماركت.");
+                }
+
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify(listings)
+                });
+
+                loadAdminPanel();
+            } catch(e) { alert("Error handling admin operation."); }
+        }
+
+        async function deleteMarketListing(index) {
+            if(!confirm("Are you sure?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                listings.splice(index, 1);
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
+                alert("🗑️ Deleted."); loadMarketListings();
+            } catch(e){}
         }
 
         async function listSharesOnMarket() {
             const count = document.getElementById('sell-count').value;
             const price = document.getElementById('sell-price').value;
             if(!count || !price) return alert("Please fill fields.");
-            
-            const btn = document.getElementById('btn-publish-listing');
-            if(btn) btn.disabled = true;
-
+            document.getElementById('btn-publish-listing').disabled = true;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                const currentData = await res.json();
-                let listings = currentData.record || [];
-
-                listings.push({
-                    seller: localStorage.getItem('investor_name') || "Public Investor",
-                    shares: count,
-                    price: price
-                });
-
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-                    body: JSON.stringify(listings)
-                });
-
-                alert("🚀 Listing Published Globally!");
-                document.getElementById('sell-count').value = '';
-                document.getElementById('sell-price').value = '';
-                switchPage('market');
-            } catch(err) {
-                alert("Database Connection Error.");
-            } finally { if(btn) btn.disabled = false; }
+                let listings = (await res.json()).record || [];
+                listings.push({ seller: localStorage.getItem('investor_name'), shares: count, price: price, status: "active" });
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
+                alert("🚀 Published!"); document.getElementById('sell-count').value = ''; document.getElementById('sell-price').value = ''; switchPage('market');
+            } catch(err) { alert("Error."); } finally { document.getElementById('btn-publish-listing').disabled = false; }
         }
 
-        function initChart() {
-            const chartEl = document.getElementById('performanceChart');
-            if(!chartEl) return;
-            const ctx = chartEl.getContext('2d');
-            window.myChart = new Chart(ctx, { 
-                type: 'line', 
-                data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, 
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } 
-            });
-        }
-
+        function initChart() { const ctx = document.getElementById('performanceChart').getContext('2d'); window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
         function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
     </script>
 </body>
