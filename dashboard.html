@@ -100,6 +100,7 @@
     </div>
 
     <div class="main-content">
+        <!-- Dashboard -->
         <div id="page-dashboard" class="page-section active">
             <div class="section-header"><h2>Dashboard</h2><p>Live portfolio overview performance</p></div>
             <div class="metrics-grid">
@@ -111,16 +112,19 @@
             <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         </div>
 
+        <!-- Transactions -->
         <div id="page-transactions" class="page-section">
             <div class="section-header"><h2>Transactions Archive</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead><tbody id="archive-tx-body"></tbody></table></div>
         </div>
 
+        <!-- Shareholders -->
         <div id="page-shareholders" class="page-section">
             <div class="section-header"><h2>Shareholders Ledger</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
         </div>
 
+        <!-- Market -->
         <div id="page-market" class="page-section">
             <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
@@ -131,6 +135,7 @@
             </div>
         </div>
 
+        <!-- Portal -->
         <div id="page-my-portal" class="page-section">
             <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
             <div class="metrics-grid">
@@ -145,6 +150,7 @@
             </div>
         </div>
 
+        <!-- Admin Approvals Panel -->
         <div id="page-admin-panel" class="page-section">
             <div class="section-header"><h2>Admin Control Panel</h2><p>Review requests, update your Google Sheet manually, then confirm here</p></div>
             <div class="table-wrapper">
@@ -167,7 +173,6 @@
             if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
             const role = localStorage.getItem('user_role');
-            // التأكد من إظهار بوابات المستثمر بناءً على وجود اسم مسجل أو دور مستثمر
             if(role === 'investor' || localStorage.getItem('investor_name')) {
                 const item = document.getElementById('investor-menu-item');
                 if(item) item.style.display = 'flex';
@@ -320,7 +325,6 @@
             } catch(e){ }
         }
 
-        // 🛑 التعديل تم هنا فقط بناءً على طلبك
         async function initiatePurchase(index) {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
@@ -331,23 +335,23 @@
                 const maxAvailable = parseInt(item.shares);
                 const pricePerShare = parseInt(item.price);
 
-                let inputCount = prompt(`كم عدد الأسهم التي تريد شراءها؟ (المتاح حالياً: ${maxAvailable})`);
+                let inputCount = prompt(`Enter number of shares to buy (Available: ${maxAvailable}):`);
                 if (!inputCount) return;
 
                 let buyCount = parseInt(inputCount);
                 if (isNaN(buyCount) || buyCount <= 0 || buyCount > maxAvailable) {
-                    return alert("العدد الذي أدخلته غير صالح أو يتجاوز الأسهم المتاحة.");
+                    return alert("Invalid share quantity or exceeds available units.");
                 }
 
                 let totalAmount = buyCount * pricePerShare;
                 let sellerName = item.seller;
 
-                let confirmMsg = `⚠️ تعليمات الدفع:\n\nقم بتحويل مبلغ (${totalAmount.toLocaleString()} GLD) إلى حساب المالك (${sellerName}) عبر نظام MPL.\n\nبعد إتمام التحويل، اضغط موافق وأدخل اسم حسابك في MPL لتأكيد الطلب وإرساله للأدمن.`;
+                let confirmMsg = `Payment Instructions:\n\nPlease transfer (${totalAmount.toLocaleString()} GLD) to owner (${sellerName}) via MPL.\n\nAfter payment, click OK and enter your MPL username to submit your request to the admin.`;
                 
                 if (!confirm(confirmMsg)) return;
 
-                const buyerMPL = prompt("أدخل اسم حسابك في MPL (اسمك الذي قمت بالتحويل منه):");
-                if (!buyerMPL) return alert("تم إلغاء الطلب لعدم إدخال اسم حساب MPL.");
+                const buyerMPL = prompt("Enter your MPL Username (the account you transferred from):");
+                if (!buyerMPL) return alert("Purchase cancelled because MPL Username was not provided.");
 
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
@@ -359,9 +363,9 @@
                     body: JSON.stringify(listings)
                 });
 
-                alert("✅ تم إرسال طلب الشراء بنجاح! في انتظار مراجعة وتأكيد الأدمن.");
+                alert("Request sent successfully! Awaiting admin review.");
                 loadMarketListings();
-            } catch(err) { alert("حدث خطأ في الاتصال بالخادم."); }
+            } catch(err) { alert("Server connection error."); }
         }
 
         async function loadAdminPanel() {
@@ -393,9 +397,9 @@
 
         async function processAdminDecision(index, action) {
             if(action === 'approve') {
-                if(!confirm("تنبيه: اضغط موافق فقط إذا قمت بالفعل بتعديل ملف الـ Google Sheet يدوياً ونقل الأسهم! هل تريد مسح الطلب الآن؟")) return;
+                if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Clear this request?")) return;
             } else {
-                if(!confirm("هل أنت متأكد من رفض هذه العملية وإعادة العرض للماركت؟")) return;
+                if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
             }
 
             try {
@@ -405,11 +409,11 @@
 
                 if(action === 'approve') {
                     listings.splice(index, 1);
-                    alert("✅ تم تأكيد النقل ومسح الطلب من السيستم بنجاح.");
+                    alert("Transfer confirmed and request cleared successfully.");
                 } else {
                     listings[index].status = "active";
                     delete listings[index].buyer;
-                    alert("❌ تم رفض الطلب وإعادة الأسهم للماركت.");
+                    alert("Request rejected and shares returned to market.");
                 }
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
@@ -429,7 +433,7 @@
                 let listings = (await res.json()).record || [];
                 listings.splice(index, 1);
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
-                alert("🗑️ Deleted."); loadMarketListings();
+                alert("Deleted."); loadMarketListings();
             } catch(e){}
         }
 
@@ -444,7 +448,7 @@
                 let listings = (await res.json()).record || [];
                 listings.push({ seller: localStorage.getItem('investor_name') || "Investor", shares: count, price: price, status: "active" });
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
-                alert("🚀 Published!"); document.getElementById('sell-count').value = ''; document.getElementById('sell-price').value = ''; switchPage('market');
+                alert("Published!"); document.getElementById('sell-count').value = ''; document.getElementById('sell-price').value = ''; switchPage('market');
             } catch(err) { alert("Error."); } finally { if(btn) btn.disabled = false; }
         }
 
