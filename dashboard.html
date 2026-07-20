@@ -100,7 +100,6 @@
     </div>
 
     <div class="main-content">
-        <!-- Dashboard -->
         <div id="page-dashboard" class="page-section active">
             <div class="section-header"><h2>Dashboard</h2><p>Live portfolio overview performance</p></div>
             <div class="metrics-grid">
@@ -112,19 +111,16 @@
             <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         </div>
 
-        <!-- Transactions -->
         <div id="page-transactions" class="page-section">
             <div class="section-header"><h2>Transactions Archive</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead><tbody id="archive-tx-body"></tbody></table></div>
         </div>
 
-        <!-- Shareholders -->
         <div id="page-shareholders" class="page-section">
             <div class="section-header"><h2>Shareholders Ledger</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
         </div>
 
-        <!-- Market -->
         <div id="page-market" class="page-section">
             <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
@@ -135,7 +131,6 @@
             </div>
         </div>
 
-        <!-- Portal -->
         <div id="page-my-portal" class="page-section">
             <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
             <div class="metrics-grid">
@@ -150,7 +145,6 @@
             </div>
         </div>
 
-        <!-- Admin Approvals Panel -->
         <div id="page-admin-panel" class="page-section">
             <div class="section-header"><h2>Admin Control Panel</h2><p>Review requests, update your Google Sheet manually, then confirm here</p></div>
             <div class="table-wrapper">
@@ -255,7 +249,7 @@
                 const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                let html = "";
+                let rowsData = [];
                 
                 json.table.rows.forEach(r => {
                     if(r && r.c) {
@@ -265,14 +259,18 @@
                         let desc = r.c[3] ? r.c[3].v : "";
                         
                         if(rv > 0) {
-                            html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`;
+                            rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`);
                         } else if(ev > 0) {
-                            html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`;
+                            rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`);
                         }
                     }
                 });
+                
+                // العكس لعرض الأحدث أولاً (Newest First)
+                rowsData.reverse();
+                
                 const body = document.getElementById('archive-tx-body');
-                if(body) body.innerHTML = html || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
+                if(body) body.innerHTML = rowsData.join("") || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
             } catch(e){}
         }
 
@@ -353,9 +351,14 @@
                 const buyerMPL = prompt("Enter your MPL Username (the account you transferred from):");
                 if (!buyerMPL) return alert("Purchase cancelled because MPL Username was not provided.");
 
+                // تحديث العرض في حال الشراء الجزئي (إبقاء المتبقي في الماركت وإرسال المطلوب لـ pending)
+                const remainingShares = maxAvailable - buyCount;
+                
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
-                listings[index].shares = buyCount;
+                listings[index].shares = buyCount; // الكمية المطلوبة المعلقة للأدمن
+                listings[index].originalIndex = index;
+                listings[index].remainingShares = remainingShares;
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
@@ -384,8 +387,9 @@
                             <td>${item.shares} Units</td>
                             <td>${total.toLocaleString()} GLD</td>
                             <td>
-                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'approve')">Approve (Done in Sheet)</button>
-                                <button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
+                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'approve')">Approve</button>
+                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
+                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="processAdminDecision(${index}, 'remove')">Remove / Done</button>
                             </td>
                         </tr>`;
                     }
@@ -397,22 +401,39 @@
 
         async function processAdminDecision(index, action) {
             if(action === 'approve') {
-                if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Clear this request?")) return;
-            } else {
+                if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
+            } else if(action === 'reject') {
                 if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
+            } else if(action === 'remove') {
+                if(!confirm("Are you sure you want to remove this row completely?")) return;
             }
 
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const currentData = await res.json();
                 let listings = currentData.record || [];
+                const item = listings[index];
 
-                if(action === 'approve') {
+                if(action === 'approve' || action === 'remove') {
+                    // إذا كان هناك متبقي من الشراء الجزئي، نقوم بإنشاء عنصر جديد active بالمتبقي وإزالة الطلب المعلق
+                    if (item.remainingShares && item.remainingShares > 0 && action === 'approve') {
+                        listings.push({
+                            seller: item.seller,
+                            shares: item.remainingShares,
+                            price: item.price,
+                            status: "active"
+                        });
+                    }
                     listings.splice(index, 1);
-                    alert("Transfer confirmed and request cleared successfully.");
-                } else {
+                    alert("Operation completed successfully.");
+                } else if(action === 'reject') {
+                    // إعادة الكمية الأصلية أو دمجها في الماركت
+                    let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
+                    listings[index].shares = restoredShares;
                     listings[index].status = "active";
                     delete listings[index].buyer;
+                    delete listings[index].remainingShares;
+                    delete listings[index].originalIndex;
                     alert("Request rejected and shares returned to market.");
                 }
 
