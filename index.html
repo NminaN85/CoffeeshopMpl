@@ -1,51 +1,90 @@
-const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mocha Enterprise | Premium Access</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+</head>
+<body>
 
-async function handleLogin(e) {
-    e.preventDefault();
-    const codeInput = document.getElementById('access-code').value.trim();
-    
-    // الكود العام الافتراضي لعرض الداتا فقط
-    if(codeInput === "MOCHA2026") { 
-        localStorage.setItem('mocha_auth', 'true');
-        localStorage.setItem('user_role', 'public');
-        window.location.href = 'dashboard.html';
-        return;
-    }
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader">
+            <div class="spinner"></div>
+            <p class="loading-text">Securing Connection...</p>
+        </div>
+    </div>
 
-    try {
-        // فحص أكواد الملاك من شيت Investors
-        const response = await fetch(BASE_URL + "&sheet=Investors&nocache=" + new Date().getTime());
-        const text = await response.text();
-        const json = JSON.parse(text.substr(47).slice(0, -2));
-        const rows = json.table.rows;
+    <div class="bg-overlay"></div>
 
-        let foundInvestor = null;
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row && row.c && row.c[2]) {
-                const sheetCode = row.c[2].v ? row.c[2].v.toString().trim() : "";
-                if (sheetCode === codeInput) {
-                    foundInvestor = {
-                        name: row.c[0].v,
-                        shares: parseFloat(row.c[1].v || 0),
-                        rowIndex: i
-                    };
-                    break;
-                }
+    <main class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-wrapper">
+                    <i class="fa-solid fa-crown gold-glow"></i>
+                </div>
+                <h1>MOCHA ENTERPRISE</h1>
+                <p class="subtitle">Private Investment Hub & Asset Management</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="access-key">VIP ACCESS KEY</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input 
+                            type="password" 
+                            id="access-key" 
+                            placeholder="Enter your MPL access code..." 
+                            required
+                        >
+                        <button type="button" id="toggle-password" onclick="togglePass()">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="error-message" class="error-message" style="display: none; color: #ff453a; margin: 10px 0; font-size: 0.9rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid Access Key. Try again.
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <span>VERIFY ACCESS</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Authorized personnel only. All activities are logged.</p>
+                <div class="mpl-badge">MPL Verified Ecosystem</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+
+        // إخفاء شاشة التحميل بعد اكتمال فتح الصفحة
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loading-screen');
+            if(loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }, 800);
             }
-        }
+        });
 
-        if (foundInvestor) {
-            localStorage.setItem('mocha_auth', 'true');
-            localStorage.setItem('user_role', 'investor');
-            localStorage.setItem('investor_name', foundInvestor.name);
-            localStorage.setItem('investor_shares', foundInvestor.shares);
-            window.location.href = 'dashboard.html';
-        } else {
-            alert("❌ الكود غير صحيح، يرجى المحاولة مرة أخرى!");
-        }
-    } catch (err) {
-        console.error(err);
-        alert("حدث خطأ أثناء الاتصال بالسيرفر!");
-    }
-}
+        // دالة إظهار وإخفاء الباسوورد عند الضغط على العين
+        function togglePass() {
+            const passInput = document.getElementById('access-key');
+            const eyeIcon = document.querySelector('#toggle-password i');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type = "password";
+                eyeIcon.
