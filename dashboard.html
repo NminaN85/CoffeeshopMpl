@@ -173,19 +173,34 @@
             if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
             const role = localStorage.getItem('user_role');
-            if(role === 'investor') {
-                document.getElementById('investor-menu-item').style.display = 'flex';
-                document.getElementById('portal-owner-name').innerText = localStorage.getItem('investor_name');
-                document.getElementById('portal-shares-count').innerText = localStorage.getItem('investor_shares');
-            } else if (role === 'admin') {
-                document.getElementById('admin-menu-item').style.display = 'flex';
+            // التأكد من إظهار بوابات المستثمر بناءً على وجود اسم مسجل أو دور مستثمر
+            if(role === 'investor' || localStorage.getItem('investor_name')) {
+                const item = document.getElementById('investor-menu-item');
+                if(item) item.style.display = 'flex';
+                
+                const ownerName = localStorage.getItem('investor_name') || "Investor";
+                const ownerShares = localStorage.getItem('investor_shares') || "0";
+                
+                if(document.getElementById('portal-owner-name')) document.getElementById('portal-owner-name').innerText = ownerName;
+                if(document.getElementById('portal-shares-count')) document.getElementById('portal-shares-count').innerText = ownerShares;
+            } 
+            
+            if (role === 'admin') {
+                const adminItem = document.getElementById('admin-menu-item');
+                if(adminItem) adminItem.style.display = 'flex';
             }
-            initChart(); loadCurrentMonthDashboard(); loadArchiveTransactions(); loadShareholders(); loadMarketListings();
+            
+            initChart(); 
+            loadCurrentMonthDashboard(); 
+            loadArchiveTransactions(); 
+            loadShareholders(); 
+            loadMarketListings();
         });
 
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
+            const target = document.getElementById('page-' + pageId);
+            if(target) target.classList.add('active');
             toggleMenu();
             if(pageId === 'market') loadMarketListings();
             if(pageId === 'admin-panel') loadAdminPanel();
@@ -197,52 +212,87 @@
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let rev = 0, exp = 0, cLabels = [], cData = [], bal = 0;
+                
                 json.table.rows.forEach(r => {
                     if(r && r.c) {
                         let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
                         let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
                         let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-                        if(rV > 0) { rev += rV; bal += rV; cLabels.push(d); cData.push(bal); }
-                        if(eV > 0) { exp += eV; bal -= eV; cLabels.push(d); cData.push(bal); }
+                        
+                        if(rV > 0 || eV > 0) {
+                            rev += rV;
+                            exp += eV;
+                            bal += (rV - eV);
+                            cLabels.push(d);
+                            cData.push(bal);
+                        }
                     }
                 });
+                
                 const profits = rev - exp;
-                document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
-                document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
-                document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
-                document.getElementById('share-profit').innerText = (profits / 120).toFixed(2) + " GLD";
-                window.myChart.data.labels = cLabels; window.myChart.data.datasets[0].data = cData; window.myChart.update();
+                const sp = profits / 120;
+                
+                if(document.getElementById('total-profits')) document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
+                if(document.getElementById('green-text')) document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
+                if(document.getElementById('expenses')) document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
+                if(document.getElementById('share-profit')) document.getElementById('share-profit').innerText = sp.toFixed(2) + " GLD";
+                
+                const portalProfitEl = document.getElementById('portal-est-profit');
+                if(portalProfitEl) {
+                    const userShares = parseFloat(localStorage.getItem('investor_shares') || 0);
+                    portalProfitEl.innerText = (sp * userShares).toFixed(2) + " GLD";
+                }
+
+                if(window.myChart && cLabels.length > 0) {
+                    window.myChart.data.labels = cLabels; 
+                    window.myChart.data.datasets[0].data = cData; 
+                    window.myChart.update();
+                }
             } catch(e){}
         }
 
         async function loadArchiveTransactions() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let html = "";
-                json.table.rows.slice(0, 20).forEach(r => {
+                
+                json.table.rows.forEach(r => {
                     if(r && r.c) {
                         let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
                         let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                        let ev = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
                         let desc = r.c[3] ? r.c[3].v : "";
-                        if(rv > 0) html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv}</span></td></tr>`;
+                        
+                        if(rv > 0) {
+                            html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`;
+                        } else if(ev > 0) {
+                            html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`;
+                        }
                     }
                 });
-                document.getElementById('archive-tx-body').innerHTML = html;
+                const body = document.getElementById('archive-tx-body');
+                if(body) body.innerHTML = html || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
             } catch(e){}
         }
 
         async function loadShareholders() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 let h = "";
+                
                 json.table.rows.forEach((r,i) => {
-                    if(i>0 && r.c && r.c[0]) h += `<tr><td>${r.c[0].v}</td><td>${r.c[1].v}</td><td><span class="gold-text">${((r.c[1].v/120)*100).toFixed(1)}%</span></td></tr>`;
+                    if(i > 0 && r.c && r.c[0]) {
+                        const name = r.c[0].v;
+                        const shares = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                        h += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
+                    }
                 });
-                document.getElementById('sh-table-body').innerHTML = h;
+                const body = document.getElementById('sh-table-body');
+                if(body) body.innerHTML = h;
             } catch(e){}
         }
 
@@ -271,7 +321,8 @@
                         </tr>`;
                     }
                 });
-                document.getElementById('market-table-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
+                const body = document.getElementById('market-table-body');
+                if(body) body.innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
             } catch(e){ }
         }
 
@@ -320,7 +371,8 @@
                         </tr>`;
                     }
                 });
-                document.getElementById('admin-table-body').innerHTML = html || "<tr><td colspan='5' style='text-align:center; padding:20px;'>No pending approvals.</td></tr>";
+                const body = document.getElementById('admin-table-body');
+                if(body) body.innerHTML = html || "<tr><td colspan='5' style='text-align:center; padding:20px;'>No pending approvals.</td></tr>";
             } catch(e){}
         }
 
@@ -337,11 +389,9 @@
                 let listings = currentData.record || [];
 
                 if(action === 'approve') {
-                    // مسح العرض نهائياً من السوق والأدمن لأن الأدمن أكد أنه عدله يدوياً في الشيت
                     listings.splice(index, 1);
                     alert("✅ تم تأكيد النقل ومسح الطلب من السيستم بنجاح.");
                 } else {
-                    // الرفض يعيد العرض حراً في الماركت
                     listings[index].status = "active";
                     delete listings[index].buyer;
                     alert("❌ تم رفض الطلب وإعادة الأسهم للماركت.");
@@ -372,17 +422,24 @@
             const count = document.getElementById('sell-count').value;
             const price = document.getElementById('sell-price').value;
             if(!count || !price) return alert("Please fill fields.");
-            document.getElementById('btn-publish-listing').disabled = true;
+            const btn = document.getElementById('btn-publish-listing');
+            if(btn) btn.disabled = true;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 let listings = (await res.json()).record || [];
-                listings.push({ seller: localStorage.getItem('investor_name'), shares: count, price: price, status: "active" });
+                listings.push({ seller: localStorage.getItem('investor_name') || "Investor", shares: count, price: price, status: "active" });
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
                 alert("🚀 Published!"); document.getElementById('sell-count').value = ''; document.getElementById('sell-price').value = ''; switchPage('market');
-            } catch(err) { alert("Error."); } finally { document.getElementById('btn-publish-listing').disabled = false; }
+            } catch(err) { alert("Error."); } finally { if(btn) btn.disabled = false; }
         }
 
-        function initChart() { const ctx = document.getElementById('performanceChart').getContext('2d'); window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
+        function initChart() { 
+            const chartEl = document.getElementById('performanceChart');
+            if(!chartEl) return;
+            const ctx = chartEl.getContext('2d'); 
+            window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); 
+        }
+        
         function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
     </script>
 </body>
