@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="assets/css/animations.css">
     
     <style>
-        /* كود أمان إضافي لضمان عمل واختفاء شاشة التحميل تلقائياً وبسلاسة */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -87,22 +86,17 @@
     <script>
         const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
 
-        // إخفاء شاشة التحميل فوراً وبشكل مضمون بمجرد ما الصفحة تحمل
         function hideLoader() {
             const loader = document.getElementById('loading-screen');
             if (loader) {
                 loader.classList.add('fade-out');
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 500);
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
             }
         }
 
-        // تشغيل دالة الإخفاء احتياطياً بعد ثانية واحدة كحد أقصى حتى لو السيرفر تأخر
         window.addEventListener('load', hideLoader);
         setTimeout(hideLoader, 1000);
 
-        // دالة إظهار وإخفاء الباسوورد عند الضغط على العين
         function togglePass() {
             const passInput = document.getElementById('access-key');
             const eyeIcon = document.querySelector('#toggle-password i');
@@ -117,7 +111,6 @@
             }
         }
 
-        // دالة التحقق الذكي من الكود من الجوجل شيت
         async function handleLogin(e) {
             e.preventDefault();
             
@@ -128,42 +121,57 @@
             errDiv.style.display = 'none';
             btn.innerText = "AUTHENTICATING...";
 
-            // 1. الكود العام الموحد الجديد (MPL2026)
+            // الكود العام الموحد (MPL2026)
             if(codeInput === "MPL2026") { 
                 localStorage.setItem('mocha_auth', 'true');
                 localStorage.setItem('user_role', 'public');
+                btn.innerText = "ACCESS GRANTED";
                 window.location.href = 'dashboard.html';
                 return;
             }
 
             try {
-                // 2. فحص الأكواد الفردية للملاك من شيت Investors
+                // سحب بيانات الملاك والأدمن من شيت Investors
                 const response = await fetch(BASE_URL + "&sheet=Investors&nocache=" + new Date().getTime());
                 const text = await response.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 const rows = json.table.rows;
 
-                let foundInvestor = null;
+                let authUser = null;
+
+                // الفحص والتحقق من الأكواد
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i];
                     if (row && row.c && row.c[2]) {
                         const sheetCode = row.c[2].v ? row.c[2].v.toString().trim() : "";
+                        
                         if (sheetCode === codeInput) {
-                            foundInvestor = {
-                                name: row.c[0] ? row.c[0].v : "Investor",
-                                shares: row.c[1] ? parseFloat(row.c[1].v || 0) : 0
-                            };
+                            // 🔍 إذا كان الكود في الصف الثالث (i = 2 تعني الصف الثالث لأن العد يبدأ من 0)
+                            // وبما أننا نتخطى الهيدر فـ i = 2 هي بالضبط الخلية C3 في الشيت
+                            if (i === 2) {
+                                authUser = {
+                                    role: 'admin',
+                                    name: 'System Admin',
+                                    shares: 0
+                                };
+                            } else {
+                                authUser = {
+                                    role: 'investor',
+                                    name: row.c[0] ? row.c[0].v : "Investor",
+                                    shares: row.c[1] ? parseFloat(row.c[1].v || 0) : 0
+                                };
+                            }
                             break;
                         }
                     }
                 }
 
-                if (foundInvestor) {
-                    // حفظ بيانات المالك المسجل في ذاكرة المتصفح للتعرف عليه بالداشبورد
+                if (authUser) {
+                    // تخزين البيانات والصلاحية المحددة بناءً على مكان الكود في الشيت
                     localStorage.setItem('mocha_auth', 'true');
-                    localStorage.setItem('user_role', 'investor');
-                    localStorage.setItem('investor_name', foundInvestor.name);
-                    localStorage.setItem('investor_shares', foundInvestor.shares);
+                    localStorage.setItem('user_role', authUser.role);
+                    localStorage.setItem('investor_name', authUser.name);
+                    localStorage.setItem('investor_shares', authUser.shares);
                     
                     btn.innerText = "ACCESS GRANTED";
                     window.location.href = 'dashboard.html';
