@@ -303,7 +303,7 @@
 
         async function loadMarketListings() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
@@ -314,6 +314,7 @@
                     if (item.status === "active" || !item.status || item.status === "pending") {
                         let actionButton = "";
                         
+                        // تمرير معرف فريد أو استخدام الـ Index بشكل مباشر مع التأكيد على جلب أحدث بيانات السرفر
                         if(userRole === 'admin' || item.seller === currentUserName || !currentUserName) {
                             actionButton = `<button class="badge badge-exp" onclick="deleteMarketListing(${index})">Delete</button>`;
                         } else {
@@ -383,7 +384,7 @@
 
         async function loadAdminPanel() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
@@ -418,10 +419,17 @@
             }
 
             try {
+                // جلب أحدث بيانات مباشرة لضمان مطابقة الـ Index تماماً قبل التعديل
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const currentData = await res.json();
                 let listings = currentData.record || [];
                 const item = listings[index];
+
+                if (!item) {
+                    alert("Error: Item not found or already processed.");
+                    loadAdminPanel();
+                    return;
+                }
 
                 if(action === 'approve') {
                     if (item.remainingShares && item.remainingShares > 0) {
@@ -441,28 +449,49 @@
                     delete listings[index].remainingShares;
                 }
 
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(listings)
                 });
 
-                alert(action === 'approve' ? "Approved and cleared successfully." : "Request rejected and shares returned to market.");
-                
-                // تحديث جدول لوحة التحكم فوراً لكي يختفي السطر
-                loadAdminPanel();
+                if(updateRes.ok) {
+                    alert(action === 'approve' ? "Approved and cleared successfully." : "Request rejected and shares returned to market.");
+                    loadAdminPanel();
+                } else {
+                    alert("Failed to update server database.");
+                }
             } catch(e) { alert("Error handling admin operation."); }
         }
 
         async function deleteMarketListing(index) {
             if(!confirm("Are you sure you want to delete this listing?")) return;
             try {
+                // جلب أحدث نسخة من السرفر لمنع تعارض الـ Indexes
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                let listings = (await res.json()).record || [];
-                listings.splice(index, 1);
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
-                alert("Deleted successfully."); 
-                loadMarketListings();
+                const currentData = await res.json();
+                let listings = currentData.record || [];
+                
+                if (listings[index]) {
+                    listings.splice(index, 1);
+                } else {
+                    alert("Listing not found.");
+                    loadMarketListings();
+                    return;
+                }
+
+                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                    method: "PUT", 
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+                    body: JSON.stringify(listings) 
+                });
+
+                if(updateRes.ok) {
+                    alert("Deleted successfully."); 
+                    loadMarketListings();
+                } else {
+                    alert("Failed to delete from server.");
+                }
             } catch(e){ alert("Error deleting listing."); }
         }
 
