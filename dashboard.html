@@ -310,7 +310,7 @@
                     if (item.status === "active" || !item.status) {
                         let actionButton = "";
                         if(item.seller === currentUserName) {
-                            actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing(${index})">Delete</button>`;
+                            actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing('${item.seller}', '${item.shares}', '${item.price}')">Delete</button>`;
                         } else {
                             actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;" onclick="initiatePurchase(${index})">Purchase</button>`;
                         }
@@ -385,7 +385,6 @@
                     if (item.status === "pending") {
                         const total = parseInt(item.shares) * parseInt(item.price);
                         
-                        // تمرير معرّفات فريدة (البائع والمشتري) لتفادي أي خطأ في الـ Index تماماً
                         html += `<tr>
                             <td>${item.seller}</td>
                             <td><span class="gold-text">${item.buyer}</span></td>
@@ -404,7 +403,6 @@
             } catch(e){}
         }
 
-        // دالة الـ Approve الآمنة التي تبحث بالعنصر نفسه دون الـ Indexes
         async function approveAdmin(seller, buyer) {
             if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
             try {
@@ -443,7 +441,6 @@
             } catch(e) { alert("Error connecting to server."); }
         }
 
-        // دالة الـ Reject الآمنة
         async function rejectAdmin(seller, buyer) {
             if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
             try {
@@ -478,7 +475,6 @@
             } catch(e) { alert("Error."); }
         }
 
-        // دالة الـ Remove الآمنة
         async function removeAdmin(seller, buyer) {
             if(!confirm("Are you sure you want to remove this row completely?")) return;
             try {
@@ -511,26 +507,42 @@
             }
         }
 
-        async function deleteMarketListing(index) {
-            if(!confirm("Are you sure?")) return;
+        async function deleteMarketListing(sellerName, sharesCount, priceValue) {
+            if(!confirm("Are you sure you want to delete this listing?")) return;
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                let listings = (await res.json()).record || [];
-                listings.splice(index, 1);
+                let data = await res.json();
+                let listings = data.record || [];
                 
-                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
-                    method: "PUT", 
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
-                    body: JSON.stringify(listings) 
-                });
+                const index = listings.findIndex(item => 
+                    item.seller === sellerName && 
+                    parseInt(item.shares) === parseInt(sharesCount) && 
+                    parseInt(item.price) === parseInt(priceValue) && 
+                    (item.status === "active" || !item.status)
+                );
 
-                if(updateRes.ok) {
-                    alert("Deleted."); 
-                    loadMarketListings();
+                if(index !== -1) {
+                    listings.splice(index, 1);
+                    
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                        method: "PUT", 
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+                        body: JSON.stringify(listings) 
+                    });
+
+                    if(updateRes.ok) {
+                        alert("Deleted successfully."); 
+                        loadMarketListings();
+                    } else {
+                        alert("Failed to delete from database.");
+                    }
                 } else {
-                    alert("Failed to delete from database.");
+                    alert("Listing not found in database.");
                 }
-            } catch(e){ alert("Error connecting to server."); }
+            } catch(e){ 
+                console.error(e);
+                alert("Error connecting to server."); 
+            }
         }
 
         async function listSharesOnMarket() {
