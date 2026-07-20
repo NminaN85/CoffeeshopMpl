@@ -1,90 +1,182 @@
-const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
-
-// إخفاء شاشة التحميل فوراً وبشكل مضمون بمجرد ما الصفحة تحمل
-function hideLoader() {
-    const loader = document.getElementById('loading-screen');
-    if (loader) {
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500);
-    }
-}
-
-window.addEventListener('load', hideLoader);
-setTimeout(hideLoader, 1000);
-
-// دالة إظهار وإخفاء الباسوورد عند الضغط على العين
-function togglePass() {
-    const passInput = document.getElementById('access-key');
-    const eyeIcon = document.querySelector('#toggle-password i');
-    if (passInput.type === "password") {
-        passInput.type = "text";
-        eyeIcon.classList.remove('fa-eye');
-        eyeIcon.classList.add('fa-eye-slash');
-    } else {
-        passInput.type = "password";
-        eyeIcon.classList.remove('fa-eye-slash');
-        eyeIcon.classList.add('fa-eye');
-    }
-}
-
-// دالة التحقق الذكي من الكود من الجوجل شيت
-async function handleLogin(e) {
-    e.preventDefault();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mocha Enterprise | Premium Access</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
     
-    const codeInput = document.getElementById('access-key').value.trim();
-    const errDiv = document.getElementById('error-message');
-    const btn = document.querySelector('.btn-submit span');
-    
-    errDiv.style.display = 'none';
-    btn.innerText = "AUTHENTICATING...";
+    <style>
+        /* كود أمان إضافي لضمان عمل واختفاء شاشة التحميل تلقائياً وبسلاسة */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0c0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
 
-    // 1. الكود العام الموحد (تم تعديله لـ MPL2026 بناءً على رغبتك)
-    if(codeInput === "MPL2026") { 
-        localStorage.setItem('mocha_auth', 'true');
-        localStorage.setItem('user_role', 'public');
-        window.location.href = 'dashboard.html';
-        return;
-    }
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader">
+            <div class="spinner"></div>
+            <p class="loading-text">Securing Connection...</p>
+        </div>
+    </div>
 
-    try {
-        // 2. فحص الأكواد الفردية للملاك من شيت Investors
-        const response = await fetch(BASE_URL + "&sheet=Investors&nocache=" + new Date().getTime());
-        const text = await response.text();
-        const json = JSON.parse(text.substr(47).slice(0, -2));
-        const rows = json.table.rows;
+    <div class="bg-overlay"></div>
 
-        let foundInvestor = null;
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row && row.c && row.c[2]) {
-                const sheetCode = row.c[2].v ? row.c[2].v.toString().trim() : "";
-                if (sheetCode === codeInput) {
-                    foundInvestor = {
-                        name: row.c[0] ? row.c[0].v : "Investor",
-                        shares: row.c[1] ? parseFloat(row.c[1].v || 0) : 0
-                    };
-                    break;
-                }
+    <main class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-wrapper">
+                    <i class="fa-solid fa-crown gold-glow"></i>
+                </div>
+                <h1>MOCHA ENTERPRISE</h1>
+                <p class="subtitle">Private Investment Hub & Asset Management</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="access-key">VIP ACCESS KEY</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input 
+                            type="password" 
+                            id="access-key" 
+                            placeholder="Enter your MPL access code..." 
+                            required
+                        >
+                        <button type="button" id="toggle-password" onclick="togglePass()">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="error-message" class="error-message" style="display: none; color: #ff453a; margin: 10px 0; font-size: 0.9rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid Access Key. Try again.
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <span>VERIFY ACCESS</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Authorized personnel only. All activities are logged.</p>
+                <div class="mpl-badge">MPL Verified Ecosystem</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+
+        // إخفاء شاشة التحميل فوراً وبشكل مضمون بمجرد ما الصفحة تحمل
+        function hideLoader() {
+            const loader = document.getElementById('loading-screen');
+            if (loader) {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
             }
         }
 
-        if (foundInvestor) {
-            localStorage.setItem('mocha_auth', 'true');
-            localStorage.setItem('user_role', 'investor');
-            localStorage.setItem('investor_name', foundInvestor.name);
-            localStorage.setItem('investor_shares', foundInvestor.shares);
-            
-            btn.innerText = "ACCESS GRANTED";
-            window.location.href = 'dashboard.html';
-        } else {
-            btn.innerText = "VERIFY ACCESS";
-            errDiv.style.display = 'block';
+        // تشغيل دالة الإخفاء احتياطياً بعد ثانية واحدة كحد أقصى حتى لو السيرفر تأخر
+        window.addEventListener('load', hideLoader);
+        setTimeout(hideLoader, 1000);
+
+        // دالة إظهار وإخفاء الباسوورد عند الضغط على العين
+        function togglePass() {
+            const passInput = document.getElementById('access-key');
+            const eyeIcon = document.querySelector('#toggle-password i');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type = "password";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
         }
-    } catch (err) {
-        console.error("Auth System Error:", err);
-        btn.innerText = "VERIFY ACCESS";
-        alert("❌ حدث خطأ أثناء الاتصال بقاعدة البيانات.");
-    }
-}
+
+        // دالة التحقق الذكي من الكود من الجوجل شيت
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const codeInput = document.getElementById('access-key').value.trim();
+            const errDiv = document.getElementById('error-message');
+            const btn = document.querySelector('.btn-submit span');
+            
+            errDiv.style.display = 'none';
+            btn.innerText = "AUTHENTICATING...";
+
+            // 1. الكود العام الموحد الجديد (MPL2026)
+            if(codeInput === "MPL2026") { 
+                localStorage.setItem('mocha_auth', 'true');
+                localStorage.setItem('user_role', 'public');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            try {
+                // 2. فحص الأكواد الفردية للملاك من شيت Investors
+                const response = await fetch(BASE_URL + "&sheet=Investors&nocache=" + new Date().getTime());
+                const text = await response.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                const rows = json.table.rows;
+
+                let foundInvestor = null;
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (row && row.c && row.c[2]) {
+                        const sheetCode = row.c[2].v ? row.c[2].v.toString().trim() : "";
+                        if (sheetCode === codeInput) {
+                            foundInvestor = {
+                                name: row.c[0] ? row.c[0].v : "Investor",
+                                shares: row.c[1] ? parseFloat(row.c[1].v || 0) : 0
+                            };
+                            break;
+                        }
+                    }
+                }
+
+                if (foundInvestor) {
+                    // حفظ بيانات المالك المسجل في ذاكرة المتصفح للتعرف عليه بالداشبورد
+                    localStorage.setItem('mocha_auth', 'true');
+                    localStorage.setItem('user_role', 'investor');
+                    localStorage.setItem('investor_name', foundInvestor.name);
+                    localStorage.setItem('investor_shares', foundInvestor.shares);
+                    
+                    btn.innerText = "ACCESS GRANTED";
+                    window.location.href = 'dashboard.html';
+                } else {
+                    btn.innerText = "VERIFY ACCESS";
+                    errDiv.style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Auth System Error:", err);
+                btn.innerText = "VERIFY ACCESS";
+                alert("❌ حدث خطأ أثناء الاتصال بقاعدة البيانات.");
+            }
+        }
+    </script>
+</body>
+</html>
