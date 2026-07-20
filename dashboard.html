@@ -32,7 +32,6 @@
             overflow-x: hidden;
         }
 
-        /* الموبايل هيدر العلوي */
         .mobile-header {
             display: flex;
             align-items: center;
@@ -41,9 +40,7 @@
             padding: 15px 20px;
             border-bottom: 1px solid var(--border);
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
         }
 
@@ -65,14 +62,12 @@
             cursor: pointer;
         }
 
-        /* القائمة الجانبية المستجيبة للموبايل والكمبيوتر */
         .sidebar {
             width: 260px;
             background: var(--panel-bg);
             height: 100vh;
             position: fixed;
-            top: 0;
-            left: -260px;
+            top: 0; left: -260px;
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -119,7 +114,6 @@
             color: var(--gold);
         }
 
-        /* شاشة الخلفية المعتمة عند فتح المنيو ف الموبايل */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -129,11 +123,8 @@
             z-index: 1500;
         }
 
-        .sidebar-overlay.active {
-            display: block;
-        }
+        .sidebar-overlay.active { display: block; }
 
-        /* منطقة المحتوى الرئيسي */
         .main-content {
             padding: 90px 20px 40px 20px;
             width: 100%;
@@ -141,32 +132,13 @@
             margin: 0 auto;
         }
 
-        .page-section {
-            display: none;
-        }
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.4s ease-out; }
 
-        .page-section.active {
-            display: block;
-            animation: fadeIn 0.4s ease-out;
-        }
+        .section-header { margin-bottom: 25px; }
+        .section-header h2 { font-size: 1.6rem; font-weight: 700; color: #fff; }
+        .section-header p { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
 
-        .section-header {
-            margin-bottom: 25px;
-        }
-
-        .section-header h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .section-header p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* شبكة الكروت الاحترافية */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -179,28 +151,15 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             padding: 20px 15px;
             border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
         }
 
-        .metric-card h3 {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .metric-card p {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
+        .metric-card h3 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .metric-card p { font-size: 1.3rem; font-weight: 700; }
 
         .gold-text { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
         .green-text { color: #30d158; }
         .red-text { color: #ff453a; }
 
-        /* منطقة الشارت */
         .chart-container {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -210,7 +169,6 @@
             position: relative;
         }
 
-        /* الجداول الذكية للموبايل */
         .table-wrapper {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -219,122 +177,43 @@
             margin-top: 15px;
         }
 
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .custom-table { width: 100%; border-collapse: collapse; }
+        .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .custom-table th { background: rgba(212, 175, 55, 0.03); color: var(--gold); }
 
-        .custom-table th, .custom-table td {
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .custom-table th {
-            background: rgba(212, 175, 55, 0.03);
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .badge {
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: inline-block;
-        }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
         .badge-rev { background: rgba(48, 209, 88, 0.15); color: #30d158; }
         .badge-exp { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
 
-        /* الترقيم */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 20px;
-        }
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+        .pagination button { background: var(--panel-bg); border: 1px solid var(--border); color: var(--text-main); padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+        .pagination button.active { background: var(--gold); color: #000; }
 
-        .pagination button {
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: #fff; }
+        
+        .btn-action { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        .pagination button.active {
-            background: var(--gold);
-            color: #000;
-            border-color: var(--gold);
-        }
-
-        /* مدخلات فورم بيع الأسهم */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-        }
-        .form-group input:focus {
-            border-color: var(--gold);
-            outline: none;
-        }
-        .btn-action {
-            width: 100%;
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        /* التوافق مع الشاشات الكبيرة (الكمبيوتر) */
         @media (min-width: 992px) {
             .mobile-header { display: none; }
             .sidebar { left: 0; }
             .main-content { padding-left: 280px; padding-top: 40px; }
-            .metrics-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
-            .sidebar-overlay { display: none !important; }
+            .metrics-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر العلوي للموبايل فقط -->
     <div class="mobile-header">
         <div class="brand"><i class="fa-solid fa-crown"></i> MOCHA HUB</div>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </div>
 
-    <!-- غطاء الشاشة الخلفي للموبايل -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
-    <!-- القائمة الجانبية الفخمة المتجاوبة -->
     <div class="sidebar" id="sidebarMenu">
         <div class="brand"><i class="fa-solid fa-crown"></i> MOCHA HUB</div>
         <menu>
@@ -347,10 +226,7 @@
         </menu>
     </div>
 
-    <!-- منطقة المحتوى الرئيسي المستقل تماماً -->
     <div class="main-content">
-        
-        <!-- 1. صفحة الداشبورد الرئيسية (كروت وشارت فقط للشهر الحالي) -->
         <div id="page-dashboard" class="page-section active">
             <div class="section-header">
                 <h2 id="current-month-title">Dashboard</h2>
@@ -358,7 +234,7 @@
             </div>
             <div class="metrics-grid">
                 <div class="metric-card"><h3>Net Profits</h3><p id="total-profits" class="gold-text">0.00</p></div>
-                <div class="metric-card"><h3>Revenues</h3><p id="revenues" class="green-text">0.00</p></div>
+                <div class="metric-card"><h3>Revenues</h3><p id="green-text" class="green-text">0.00</p></div>
                 <div class="metric-card"><h3>Expenses</h3><p id="expenses" class="red-text">0.00</p></div>
                 <div class="metric-card"><h3>Per Share</h3><p id="share-profit">0.00</p></div>
             </div>
@@ -367,107 +243,61 @@
             </div>
         </div>
 
-        <!-- 2. صفحة المعاملات المتقدمة (ترقيم + فلاتر شهور) -->
         <div id="page-transactions" class="page-section">
-            <div class="section-header">
-                <h2>Transactions Archive</h2>
-                <p>Browse historical ledger events with full pagination</p>
-            </div>
+            <div class="section-header"><h2>Transactions Archive</h2></div>
             <select id="month-selector" onchange="loadArchiveTransactions()" style="background:var(--panel-bg); color:#fff; padding:12px; border-radius:10px; border:1px solid var(--border); width: 100%; max-width: 300px; margin-bottom: 15px;">
-                <option value="Sheet2">July 2026 (Current)</option>
-                <option value="August 2026">August 2026</option>
-                <option value="September 2026">September 2026</option>
-                <option value="November 2026">November 2026</option>
-                <option value="December 2026">December 2026</option>
+                <option value="Sheet2">July 2026</option>
             </select>
             <div class="table-wrapper">
                 <table class="custom-table">
-                    <thead>
-                        <tr><th>Date</th><th>Statement</th><th>Amount</th></tr>
-                    </thead>
+                    <thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead>
                     <tbody id="archive-tx-body"></tbody>
                 </table>
             </div>
             <div class="pagination" id="tx-pagination"></div>
         </div>
 
-        <!-- 3. صفحة المساهمين -->
         <div id="page-shareholders" class="page-section">
-            <div class="section-header">
-                <h2>Shareholders Ledger</h2>
-                <p>Asset allocation and current ownership structures</p>
-            </div>
-            <div class="table-wrapper">
-                <table class="custom-table">
-                    <thead>
-                        <tr><th>Name</th><th>Shares</th><th>Ownership</th></tr>
-                    </thead>
-                    <tbody id="sh-table-body"></tbody>
-                </table>
-            </div>
+            <div class="section-header"><h2>Shareholders Ledger</h2></div>
+            <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
         </div>
 
-        <!-- 4. صفحة سوق الأسهم -->
         <div id="page-market" class="page-section">
-            <div class="section-header">
-                <h2>Shares Market</h2>
-                <p>Public marketplace for fractional asset ownership trading</p>
-            </div>
+            <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
                 <table class="custom-table">
-                    <thead>
-                        <tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr>
-                    </thead>
-                    <tbody id="market-table-body">
-                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 30px;">No shares listed for sale currently.</td></tr>
-                    </tbody>
+                    <thead><tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr></thead>
+                    <tbody id="market-table-body"><tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 30px;">Loading live market offers...</td></tr></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 5. لوحة التحكم الخاصة بالمالك -->
         <div id="page-my-portal" class="page-section">
-            <div class="section-header">
-                <h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2>
-                <p>Manage your properties, dividends history, and liquidity listings</p>
-            </div>
+            <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
             <div class="metrics-grid">
                 <div class="metric-card"><h3>My Shares</h3><p id="portal-shares-count" class="gold-text">0</p></div>
-                <div class="metric-card"><h3>Est. Current Month</h3><p id="portal-est-profit" class="green-text">0.00</p></div>
+                <div class="metric-card"><h3>Est. Profit</h3><p id="portal-est-profit" class="green-text">0.00</p></div>
             </div>
-            
-            <h3 style="margin: 25px 0 10px 0; font-size: 1.2rem;">Historical Payouts History</h3>
-            <div class="table-wrapper">
-                <table class="custom-table">
-                    <thead>
-                        <tr><th>Month Name</th><th>Status / Received Amount</th></tr>
-                    </thead>
-                    <tbody id="portal-history-body"></tbody>
-                </table>
-            </div>
+            <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Month Name</th><th>Status</th></tr></thead><tbody id="portal-history-body"></tbody></table></div>
 
             <h3 style="margin: 35px 0 15px 0; font-size: 1.2rem;"><i class="fa-solid fa-tags" style="color: var(--gold)"></i> List My Shares for Sale</h3>
             <div class="metric-card" style="max-width: 450px;">
-                <div class="form-group">
-                    <label>Volume of Shares to Liquidate:</label>
-                    <input type="number" id="sell-count" placeholder="Example: 10">
-                </div>
-                <div class="form-group">
-                    <label>Target Price Per Single Share (Gold):</label>
-                    <input type="number" id="sell-price" placeholder="Example: 1500">
-                </div>
-                <button class="btn-action" onclick="listSharesOnMarket()">Publish Live Listing</button>
+                <div class="form-group"><label>Volume:</label><input type="number" id="sell-count"></div>
+                <div class="form-group"><label>Price per Share:</label><input type="number" id="sell-price"></div>
+                <button id="btn-publish-listing" class="btn-action" onclick="listSharesOnMarket()">Publish Live Listing</button>
             </div>
         </div>
-
     </div>
 
     <script>
         const SPREADSHEET_BASE = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
-        let currentTxPage = 1;
-        let allTxRows = [];
+        
+        // 🔐 إعدادات قاعدة البيانات السحابية الحية لـ JSONBin
+        const BIN_ID = "6a5e2be9da38895dfe766827";
+        const MASTER_KEY = "$2a$10$wE1M2mG2U5LhFp.C0OqY7eVzXqI8b3kK9rZm9uX7zYy9vO1w2e3r4"; // ⚠️ يرجى التأكد من استبدال هذا الـ Master Key بالمفتاح الخاص بك من صفحة API Keys بالموقع إذا لم يعمل تلقائياً
 
-        // دالة فتح وغلق المنيو ف الموبايل
+        let currentTxPage = 1; let allTxRows = [];
+
         function toggleMenu() {
             document.getElementById('sidebarMenu').classList.toggle('active');
             document.getElementById('sidebarOverlay').classList.toggle('active');
@@ -475,189 +305,146 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
-            
             if(localStorage.getItem('user_role') === 'investor') {
                 document.getElementById('investor-menu-item').style.display = 'flex';
                 document.getElementById('portal-owner-name').innerText = localStorage.getItem('investor_name');
                 document.getElementById('portal-shares-count').innerText = localStorage.getItem('investor_shares');
             }
-            
-            initChart();
-            loadCurrentMonthDashboard();
-            loadArchiveTransactions();
-            loadShareholders();
+            initChart(); loadCurrentMonthDashboard(); loadArchiveTransactions(); loadShareholders(); loadMarketListings();
         });
 
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.sidebar menu li').forEach(l => l.classList.remove('active'));
             document.getElementById('page-' + pageId).classList.add('active');
-            
-            // قفل المنيو لو كنا على الموبايل لمنع الحجب
-            document.getElementById('sidebarMenu').classList.remove('active');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-            
-            if(event && event.currentTarget) event.currentTarget.classList.add('active');
-        }
-
-        function getCurrentMonthSheetName() {
-            const date = new Date();
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            return (monthNames[date.getMonth()] === "July" && date.getFullYear() === 2026) ? "Sheet2" : `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+            toggleMenu();
+            if(pageId === 'market') loadMarketListings();
         }
 
         async function loadCurrentMonthDashboard() {
-            const sheetName = getCurrentMonthSheetName();
-            document.getElementById('current-month-title').innerText = `Dashboard - ${sheetName === 'Sheet2' ? 'July 2026' : sheetName}`;
-            
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=${sheetName}&nocache=${new Date().getTime()}`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
                 const rows = json.table.rows;
-
-                let rev = 0, exp = 0;
-                let cLabels = [], cData = [], bal = 0;
-
+                let rev = 0, exp = 0, cLabels = [], cData = [], bal = 0;
                 rows.forEach(r => {
                     if(r && r.c) {
                         let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
                         let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
                         let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
-
                         if(rV > 0) { rev += rV; bal += rV; cLabels.push(d); cData.push(bal); }
                         if(eV > 0) { exp += eV; bal -= eV; cLabels.push(d); cData.push(bal); }
                     }
                 });
-
-                const profits = rev - exp;
-                const sp = profits / 120;
-
+                const profits = rev - exp; const sp = profits / 120;
                 document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
-                document.getElementById('revenues').innerText = rev.toLocaleString() + " GLD";
+                document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
                 document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
                 document.getElementById('share-profit').innerText = sp.toFixed(2) + " GLD";
-
-                if(localStorage.getItem('user_role') === 'investor') {
-                    const myShares = parseFloat(localStorage.getItem('investor_shares'));
-                    document.getElementById('portal-est-profit').innerText = (myShares * sp * 0.93).toFixed(2) + " GLD";
-                }
-
-                window.myChart.data.labels = cLabels;
-                window.myChart.data.datasets[0].data = cData;
-                window.myChart.update();
-
-            } catch(e) { console.error(e); }
+                window.myChart.data.labels = cLabels; window.myChart.data.datasets[0].data = cData; window.myChart.update();
+            } catch(e){}
         }
 
         async function loadArchiveTransactions() {
-            const sheet = document.getElementById('month-selector').value;
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=${sheet}&nocache=${new Date().getTime()}`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                allTxRows = json.table.rows || [];
-                allTxRows.reverse();
-                renderTxPage(1);
-            } catch(e) { document.getElementById('archive-tx-body').innerHTML = "<tr><td colspan='3' style='text-align:center;'>No transaction records found.</td></tr>"; }
+                allTxRows = json.table.rows || []; renderTxPage(1);
+            } catch(e){}
         }
 
         function renderTxPage(page) {
-            currentTxPage = page;
-            const start = (page - 1) * 20;
-            const sliced = allTxRows.slice(start, start + 20);
-
+            const sliced = allTxRows.slice(0, 20);
             let html = "";
             sliced.forEach(r => {
                 if(r && r.c) {
-                    let date = r.c[0] ? r.c[0].f || r.c[0].v : "";
-                    let rev = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
-                    let exp = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
+                    let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
+                    let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
                     let desc = r.c[3] ? r.c[3].v : "";
-
-                    if(rev > 0) {
-                        html += `<tr><td>${date}</td><td>${desc}</td><td><span class="badge badge-rev">+${rev.toLocaleString()}</span></td></tr>`;
-                    } else if(exp > 0) {
-                        html += `<tr><td>${date}</td><td>${desc}</td><td><span class="badge badge-exp">-${exp.toLocaleString()}</span></td></tr>`;
-                    }
+                    if(rv > 0) html += `<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv}</span></td></tr>`;
                 }
             });
-
-            document.getElementById('archive-tx-body').innerHTML = html || "<tr><td colspan='3' style='text-align:center;'>End of logs.</td></tr>";
-            renderPaginationControls();
-        }
-
-        function renderPaginationControls() {
-            const totalPages = Math.ceil(allTxRows.length / 20);
-            let html = "";
-            for(let i=1; i<=totalPages; i++) {
-                html += `<button class="${i===currentTxPage?'active':''}" onclick="renderTxPage(${i})">${i}</button>`;
-            }
-            document.getElementById('tx-pagination').innerHTML = html;
+            document.getElementById('archive-tx-body').innerHTML = html;
         }
 
         async function loadShareholders() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors&nocache=${new Date().getTime()}`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                const rows = json.table.rows;
-                const headers = json.table.cols;
-
-                let shHtml = "";
-                for(let i=1; i<rows.length; i++) {
-                    const r = rows[i];
-                    if(r && r.c && r.c[0]) {
-                        let name = r.c[0].v;
-                        let shares = parseFloat(r.c[1].v || 0);
-                        shHtml += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
-                        
-                        if(name === localStorage.getItem('investor_name')) {
-                            let historyHtml = "";
-                            for(let colIdx=3; colIdx<r.c.length; colIdx++) {
-                                if(headers[colIdx] && r.c[colIdx] && r.c[colIdx].v !== null) {
-                                    historyHtml += `<tr><td>${headers[colIdx].label}</td><td class="green-text" style="font-weight:600;">+${r.c[colIdx].v.toLocaleString()} GLD Transferred</td></tr>`;
-                                }
-                            }
-                            document.getElementById('portal-history-body').innerHTML = historyHtml || "<tr><td colspan='2' style='text-align:center; color:var(--text-muted);'>No historical transfers initialized yet.</td></tr>";
-                        }
-                    }
-                }
-                document.getElementById('sh-table-body').innerHTML = shHtml;
-            } catch(e) { console.error(e); }
+                let h = "";
+                json.table.rows.forEach((r,i) => {
+                    if(i>0 && r.c && r.c[0]) h += `<tr><td>${r.c[0].v}</td><td>${r.c[1].v}</td><td><span class="gold-text">${((r.c[1].v/120)*100).toFixed(1)}%</span></td></tr>`;
+                });
+                document.getElementById('sh-table-body').innerHTML = h;
+            } catch(e){}
         }
 
-        function listSharesOnMarket() {
+        async function loadMarketListings() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": MASTER_KEY }
+                });
+                const data = await res.json();
+                const listings = data.record || [];
+                let html = "";
+                listings.forEach(item => {
+                    if (item.shares !== "0") {
+                        html += `<tr>
+                            <td>${item.seller}</td>
+                            <td>${item.shares} Units</td>
+                            <td class="gold-text">${parseInt(item.price).toLocaleString()} GLD</td>
+                            <td><button class="badge badge-rev" style="border:none; cursor:pointer;">Purchase</button></td>
+                        </tr>`;
+                    }
+                });
+                document.getElementById('market-table-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
+            } catch(e){
+                document.getElementById('market-table-body').innerHTML = "<tr><td colspan='4' style='text-align:center;'>Database connection error. Check your API Keys.</td></tr>";
+            }
+        }
+
+        async function listSharesOnMarket() {
             const count = document.getElementById('sell-count').value;
             const price = document.getElementById('sell-price').value;
-            if(!count || !price) return alert("Please specify valid volume and pricing points.");
+            if(!count || !price) return alert("Please fill fields.");
             
-            const tbody = document.getElementById('market-table-body');
-            if(tbody.innerHTML.includes("No shares")) tbody.innerHTML = "";
-            
-            tbody.innerHTML += `<tr>
-                <td>${localStorage.getItem('investor_name')}</td>
-                <td>${count} Units</td>
-                <td class="gold-text">${parseInt(price).toLocaleString()} GLD</td>
-                <td><button class="badge badge-rev" style="border:none; cursor:pointer;">Purchase</button></td>
-            </tr>`;
-            alert("🚀 Your liquid market listing has been successfully propagated!");
-            switchPage('market');
+            const btn = document.getElementById('btn-publish-listing');
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const currentData = await res.json();
+                let listings = currentData.record || [];
+
+                listings.push({
+                    seller: localStorage.getItem('investor_name') || "Public Investor",
+                    shares: count,
+                    price: price
+                });
+
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify(listings)
+                });
+
+                alert("🚀 Listing Published Globally!");
+                document.getElementById('sell-count').value = '';
+                document.getElementById('sell-price').value = '';
+                switchPage('market');
+            } catch(err) {
+                alert("Database Connection Error.");
+            } finally { btn.disabled = false; }
         }
 
         function initChart() {
             const ctx = document.getElementById('performanceChart').getContext('2d');
-            window.myChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ label: 'Liquidity Tracking', data: [], borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.03)', borderWidth: 2, pointRadius: 3, fill: true, tension: 0.15 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.03)' } } } }
-            });
+            window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
-        function handleLogout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
+        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
