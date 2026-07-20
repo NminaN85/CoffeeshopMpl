@@ -53,15 +53,16 @@
         .red-text { color: #ff453a; }
 
         .chart-container { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 20px; border-radius: 20px; height: 320px; position: relative; }
-        .table-wrapper { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; overflow: hidden; margin-top: 15px; }
+        .table-wrapper { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; overflow-x: auto; margin-top: 15px; }
         
-        .custom-table { width: 100%; border-collapse: collapse; }
-        .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .custom-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); vertical-align: middle; }
         .custom-table th { background: rgba(212, 175, 55, 0.03); color: var(--gold); }
 
-        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; }
+        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; cursor: pointer; border: none; }
         .badge-rev { background: rgba(48, 209, 88, 0.15); color: #30d158; }
         .badge-exp { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
+        .badge-neutral { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
@@ -174,7 +175,6 @@
             
             const role = localStorage.getItem('user_role');
             
-            // تحقق صارم: إظهار بوابات المستثمر فقط لو كان دوره مستثمر وعنده اسم مسجل فعلياً (وليس أدمن)
             if(role === 'investor' && localStorage.getItem('investor_name')) {
                 const item = document.getElementById('investor-menu-item');
                 if(item) item.style.display = 'flex';
@@ -189,7 +189,6 @@
             if (role === 'admin') {
                 const adminItem = document.getElementById('admin-menu-item');
                 if(adminItem) adminItem.style.display = 'flex';
-                // تنظيف أي بقايا تخزين قديمة للمستثمر تخص الأدمن
                 localStorage.removeItem('investor_name');
             }
             
@@ -276,7 +275,7 @@
                     }
                 });
                 
-                rowsData.reverse(); // الأحدث أولاً
+                rowsData.reverse();
                 
                 const body = document.getElementById('archive-tx-body');
                 if(body) body.innerHTML = rowsData.join("") || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
@@ -314,13 +313,12 @@
                 listings.forEach((item, index) => {
                     if (item.status === "active" || !item.status) {
                         let actionButton = "";
-                        // منع الأدمن من رؤية زر الحذف أو الشراء من نفسه كونه ليس مستثمراً
                         if(userRole === 'admin') {
                             actionButton = `<span style="color:var(--text-muted); font-size:0.85rem;">Admin View</span>`;
                         } else if(item.seller === currentUserName) {
-                            actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing(${index})">Delete</button>`;
+                            actionButton = `<button class="badge badge-exp" onclick="deleteMarketListing(${index})">Delete</button>`;
                         } else {
-                            actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;" onclick="initiatePurchase(${index})">Purchase</button>`;
+                            actionButton = `<button class="badge badge-rev" onclick="initiatePurchase(${index})">Purchase</button>`;
                         }
 
                         html += `<tr>
@@ -398,8 +396,10 @@
                             <td>${item.shares} Units</td>
                             <td>${total.toLocaleString()} GLD</td>
                             <td>
-                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'approve')">Approve & Done</button>
-                                <button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <button class="badge badge-rev" onclick="processAdminDecision(${index}, 'approve')">Approve & Done</button>
+                                    <button class="badge badge-exp" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
+                                </div>
                             </td>
                         </tr>`;
                     }
