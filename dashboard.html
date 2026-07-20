@@ -101,4 +101,376 @@
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 0.75rem;
-            font-weight: 6
+            font-weight: 600;
+        }
+        .badge-rev { background: rgba(52, 199, 89, 0.12); color: #34c759; }
+        .badge-exp { background: rgba(255, 69, 58, 0.12); color: #ff453a; }
+
+        @media (max-width: 768px) {
+            .tables-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <div class="dashboard-container">
+        
+        <header class="dash-header">
+            <div class="brand">
+                <i class="fa-solid fa-crown gold-text"></i>
+                <div class="brand-text">
+                    <h2>MOCHA HUB</h2>
+                    <span id="last-update">🔄 System Initializing...</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="notification-bell">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="bell-dot"></span>
+                </div>
+                <button onclick="handleLogout()" class="btn-logout">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </header>
+
+        <section class="metrics-grid">
+            <div class="metric-card premium-glow">
+                <div class="card-icon"><i class="fa-solid fa-chart-line-up"></i></div>
+                <div class="card-info">
+                    <h3>Total Profits</h3>
+                    <p class="counter" id="total-profits">0.00 Gold</p>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="card-icon success"><i class="fa-solid fa-wallet"></i></div>
+                <div class="card-info">
+                    <h3>Revenues</h3>
+                    <p class="counter" id="revenues">0.00 Gold</p>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="card-icon danger"><i class="fa-solid fa-receipt"></i></div>
+                <div class="card-info">
+                    <h3>Expenses</h3>
+                    <p class="counter" id="expenses">0.00 Gold</p>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="card-icon info"><i class="fa-solid fa-users"></i></div>
+                <div class="card-info">
+                    <h3>Investors</h3>
+                    <p id="investors-count">0</p>
+                </div>
+            </div>
+
+            <div class="metric-card share-value-card">
+                <div class="card-icon gold"><i class="fa-solid fa-gem"></i></div>
+                <div class="card-info">
+                    <h3>Share Value</h3>
+                    <p class="counter" id="share-value">30.00 Gold</p>
+                </div>
+            </div>
+
+            <div class="metric-card premium-glow">
+                <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                <div class="card-info">
+                    <h3>Share Profit</h3>
+                    <p class="counter" id="share-profit">0.00 Gold</p>
+                </div>
+            </div>
+
+            <div class="metric-card premium-glow share-value-card">
+                <div class="card-icon"><i class="fa-solid fa-coins"></i></div>
+                <div class="card-info">
+                    <h3>Net Share Profit (-7%)</h3>
+                    <p class="counter" id="net-share-profit">0.00 Gold</p>
+                </div>
+            </div>
+
+            <div class="metric-card" style="opacity: 0.7;">
+                <div class="card-icon info"><i class="fa-solid fa-clock"></i></div>
+                <div class="card-info">
+                    <h3>Sync Status</h3>
+                    <p id="sync-time" style="font-size: 1.1rem !important; font-weight: normal;">Fetching Data...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="chart-container">
+            <div class="chart-header">
+                <h3><i class="fa-solid fa-chart-area gold-text"></i> Fund Performance Growth</h3>
+                <span class="badge">Live Analytics</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </section>
+
+        <section class="tables-section">
+            
+            <div class="custom-table-container">
+                <div class="table-header">
+                    <h3><i class="fa-solid fa-user-tie gold-text"></i> Investors Ledger</h3>
+                    <span class="badge" style="border-color: rgba(255,255,255,0.1); color: var(--text-muted);">Live Shares</span>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Investor Name</th>
+                                <th>Shares No.</th>
+                                <th>Ownership %</th>
+                                <th>Net Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="investors-table-body">
+                            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading live ledger...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="custom-table-container">
+                <div class="table-header">
+                    <h3><i class="fa-solid fa-list-check gold-text"></i> Recent Transactions</h3>
+                    <span class="badge" style="background: rgba(52, 199, 89, 0.1); color: #34c759; border-color: rgba(52, 199, 89, 0.2);">Latest 20 Items</span>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Statement / Description</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table-body">
+                            <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Loading transactions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+
+    <script>
+        if (localStorage.getItem('mocha_auth') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        function handleLogout() {
+            localStorage.removeItem('mocha_auth');
+            window.location.href = 'index.html';
+        }
+
+        const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+        const FINANCE_SHEET_URL = BASE_URL + "&sheet=Sheet2";
+        const INVESTORS_SHEET_URL = BASE_URL + "&tq=select%20*&sheet=Investors";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const goldGradient = ctx.createLinearGradient(0, 0, 0, 300);
+            goldGradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
+            goldGradient.addColorStop(1, 'rgba(212, 175, 55, 0.0)');
+
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Fund Growth (Gold)',
+                        data: [10, 20, 30, 45, 60, 80, 100],
+                        borderColor: '#d4af37',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#d4af37',
+                        backgroundColor: goldGradient,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#a1a1a6' } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#a1a1a6' } }
+                    }
+                }
+            });
+
+            fetchLiveDashboardData();
+        });
+
+        async function fetchLiveDashboardData() {
+            let totalRevenues = 44.00;
+            let totalExpenses = 138.66;
+            let liveInvestorsCount = 0;
+            const cacheBuster = '&nocache=' + new Date().getTime();
+
+            try {
+                // 1. جلب البيانات المالية والمعاملات من Sheet2
+                const finResponse = await fetch(FINANCE_SHEET_URL + cacheBuster);
+                const finText = await finResponse.text();
+                const finJson = JSON.parse(finText.substr(47).slice(0, -2));
+                const finRows = finJson.table.rows;
+
+                if (finRows && finRows.length > 0) {
+                    let tempRev = 0;
+                    let tempExp = 0;
+                    let txRowsArray = [];
+
+                    for (let i = 0; i < finRows.length; i++) {
+                        const row = finRows[i];
+                        if (row && row.c) {
+                            let revVal = row.c[1] ? parseFloat(row.c[1].v) : 0;
+                            let expVal = row.c[2] ? parseFloat(row.c[2].v) : 0;
+                            let desc = row.c[3] ? row.c[3].v : "";
+
+                            if (!isNaN(revVal) && revVal > 0) {
+                                tempRev += revVal;
+                                txRowsArray.push(`<tr>
+                                    <td><span class="badge-table badge-rev">Revenue</span></td>
+                                    <td>${desc || 'Inbound Funds'}</td>
+                                    <td style="color:#34c759; font-weight:600;">+${revVal.toFixed(2)} Gold</td>
+                                </tr>`);
+                            }
+                            if (!isNaN(expVal) && expVal > 0) {
+                                tempExp += expVal;
+                                txRowsArray.push(`<tr>
+                                    <td><span class="badge-table badge-exp">Expense</span></td>
+                                    <td>${desc || 'Outbound Operational Cost'}</td>
+                                    <td style="color:#ff453a; font-weight:600;">-${expVal.toFixed(2)} Gold</td>
+                                </tr>`);
+                            }
+                        }
+                    }
+                    
+                    if(tempRev > 0 || tempExp > 0) {
+                        totalRevenues = tempRev;
+                        totalExpenses = tempExp;
+                        
+                        txRowsArray.reverse(); 
+                        let slicedTxArray = txRowsArray.slice(0, 20); 
+                        
+                        document.getElementById("transactions-table-body").innerHTML = slicedTxArray.join("");
+                    }
+                }
+
+                // حساب الأرباح (تم تنظيف التكرار البرمجي من هنا بنجاح)
+                const totalProfits = totalRevenues - totalExpenses;
+                const shareProfit = totalProfits / 120;
+                const netShareProfit = shareProfit * 0.93;
+
+                // 2. جلب بيانات المستثمرين لايف من شيت Investors
+                const invResponse = await fetch(INVESTORS_SHEET_URL + cacheBuster);
+                const invText = await invResponse.text();
+                const invJson = JSON.parse(invText.substr(47).slice(0, -2));
+                const invRows = invJson.table.rows;
+
+                if (invRows && invRows.length > 0) {
+                    let investorsHtml = "";
+                    let countedInvestors = 0;
+
+                    let startIndex = 0;
+                    if(invRows[0] && invRows[0].c && invRows[0].c[0] && invRows[0].c[0].v) {
+                        let headerCheck = invRows[0].c[0].v.toString().toLowerCase();
+                        if(headerCheck.includes("name") || headerCheck.includes("investor")) {
+                            startIndex = 1;
+                        }
+                    }
+
+                    for (let i = startIndex; i < invRows.length; i++) {
+                        const row = invRows[i];
+                        if (row && row.c && row.c[0]) {
+                            let name = row.c[0].v;
+                            let shares = row.c[1] ? parseFloat(row.c[1].v) : 0;
+
+                            if (name && !isNaN(shares)) {
+                                countedInvestors++;
+                                let ownershipPct = ((shares / 120) * 100).toFixed(1);
+                                let personalNetProfit = shares * netShareProfit;
+                                let profitString = personalNetProfit < 0 
+                                    ? "-" + Math.abs(personalNetProfit).toFixed(2) + " Gold" 
+                                    : personalNetProfit.toFixed(2) + " Gold";
+
+                                investorsHtml += `<tr>
+                                    <td style="color: #fff; font-weight: 600;">${name}</td>
+                                    <td>${shares}</td>
+                                    <td>${ownershipPct}%</td>
+                                    <td class="gold-text" style="font-weight:600;">${profitString}</td>
+                                </tr>`;
+                            }
+                        }
+                    }
+                    liveInvestorsCount = countedInvestors;
+                    document.getElementById("investors-table-body").innerHTML = investorsHtml;
+                } else {
+                    document.getElementById("investors-table-body").innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No investors listed yet</td></tr>`;
+                }
+
+                // تحديث العدادات الفوقانية والشارت
+                const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                document.getElementById("sync-time").innerText = "Synced: " + timeString;
+                document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
+
+                animateCurrency(document.getElementById("total-profits"), totalProfits);
+                animateCurrency(document.getElementById("revenues"), totalRevenues);
+                animateCurrency(document.getElementById("expenses"), totalExpenses);
+                animateValue(document.getElementById("investors-count"), 0, liveInvestorsCount, 1000); 
+                
+                animateCurrency(document.getElementById("share-value"), 30); 
+                animateCurrency(document.getElementById("share-profit"), shareProfit); 
+                animateCurrency(document.getElementById("net-share-profit"), netShareProfit); 
+
+                window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
+                window.myChart.update();
+
+            } catch (error) {
+                console.error("Sync Error:", error);
+                document.getElementById("investors-table-body").innerHTML = `<tr><td colspan="4" style="text-align: center; color: #ff453a;">Connecting Live Ledger...</td></tr>`;
+            }
+        }
+
+        function animateCurrency(element, targetValue) {
+            if(!element) return;
+            let startTimestamp = null;
+            const duration = 1200;
+            function step(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = progress * targetValue;
+                
+                if (currentValue < 0) {
+                    element.innerText = "-" + Math.abs(currentValue).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + " Gold";
+                } else {
+                    element.innerText = currentValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + " Gold";
+                }
+                if (progress < 1) window.requestAnimationFrame(step);
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        function animateValue(obj, start, end, duration) {
+            if(!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
