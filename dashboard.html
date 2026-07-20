@@ -303,7 +303,7 @@
 
         async function loadMarketListings() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
@@ -311,20 +311,18 @@
                 const userRole = localStorage.getItem('user_role');
 
                 listings.forEach((item, index) => {
-                    if (item.status === "active" || !item.status || item.status === "pending") {
+                    if (item.status === "active" || !item.status) {
                         let actionButton = "";
-                        
-                        // تمرير معرف فريد أو استخدام الـ Index بشكل مباشر مع التأكيد على جلب أحدث بيانات السرفر
-                        if(userRole === 'admin' || item.seller === currentUserName || !currentUserName) {
+                        if(userRole === 'admin') {
+                            actionButton = `<span style="color:var(--text-muted); font-size:0.85rem;">Admin View</span>`;
+                        } else if(item.seller === currentUserName) {
                             actionButton = `<button class="badge badge-exp" onclick="deleteMarketListing(${index})">Delete</button>`;
                         } else {
                             actionButton = `<button class="badge badge-rev" onclick="initiatePurchase(${index})">Purchase</button>`;
                         }
 
-                        let statusBadge = item.status === "pending" ? ` <span style="font-size:0.75rem; color:#ff453a;">(Pending)</span>` : "";
-
                         html += `<tr>
-                            <td>${item.seller}${statusBadge}</td>
+                            <td>${item.seller}</td>
                             <td>${item.shares} Units</td>
                             <td class="gold-text">${parseInt(item.price).toLocaleString()} GLD</td>
                             <td>${actionButton}</td>
@@ -384,7 +382,7 @@
 
         async function loadAdminPanel() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
@@ -419,17 +417,10 @@
             }
 
             try {
-                // جلب أحدث بيانات مباشرة لضمان مطابقة الـ Index تماماً قبل التعديل
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const currentData = await res.json();
                 let listings = currentData.record || [];
                 const item = listings[index];
-
-                if (!item) {
-                    alert("Error: Item not found or already processed.");
-                    loadAdminPanel();
-                    return;
-                }
 
                 if(action === 'approve') {
                     if (item.remainingShares && item.remainingShares > 0) {
@@ -441,58 +432,35 @@
                         });
                     }
                     listings.splice(index, 1);
+                    alert("Approved and cleared successfully.");
                 } else if(action === 'reject') {
                     let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
                     listings[index].shares = restoredShares;
                     listings[index].status = "active";
                     delete listings[index].buyer;
                     delete listings[index].remainingShares;
+                    alert("Request rejected and shares returned to market.");
                 }
 
-                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(listings)
                 });
 
-                if(updateRes.ok) {
-                    alert(action === 'approve' ? "Approved and cleared successfully." : "Request rejected and shares returned to market.");
-                    loadAdminPanel();
-                } else {
-                    alert("Failed to update server database.");
-                }
+                loadAdminPanel();
             } catch(e) { alert("Error handling admin operation."); }
         }
 
         async function deleteMarketListing(index) {
-            if(!confirm("Are you sure you want to delete this listing?")) return;
+            if(!confirm("Are you sure?")) return;
             try {
-                // جلب أحدث نسخة من السرفر لمنع تعارض الـ Indexes
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
-                const currentData = await res.json();
-                let listings = currentData.record || [];
-                
-                if (listings[index]) {
-                    listings.splice(index, 1);
-                } else {
-                    alert("Listing not found.");
-                    loadMarketListings();
-                    return;
-                }
-
-                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
-                    method: "PUT", 
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
-                    body: JSON.stringify(listings) 
-                });
-
-                if(updateRes.ok) {
-                    alert("Deleted successfully."); 
-                    loadMarketListings();
-                } else {
-                    alert("Failed to delete from server.");
-                }
-            } catch(e){ alert("Error deleting listing."); }
+                let listings = (await res.json()).record || [];
+                listings.splice(index, 1);
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(listings) });
+                alert("Deleted."); loadMarketListings();
+            } catch(e){}
         }
 
         async function listSharesOnMarket() {
