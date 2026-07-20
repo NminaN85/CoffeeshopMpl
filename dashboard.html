@@ -294,7 +294,7 @@
         
         // 🔐 إعدادات قاعدة البيانات السحابية الحية لـ JSONBin
         const BIN_ID = "6a5e2be9da38895dfe766827";
-        const MASTER_KEY = "$2a$10$HiNNr6inK3jh2WDUwy7uRuxjWlQxU9p/RocZHrXf7d0k3R8q0FH.G"; // ⚠️ يرجى التأكد من استبدال هذا الـ Master Key بالمفتاح الخاص بك من صفحة API Keys بالموقع إذا لم يعمل تلقائياً
+        const MASTER_KEY = "$$2a$10$HiNNr6inK3jh2WDUwy7uRuxjWlQxU9p/RocZHrXf7d0k3R8q0FH.G"; // تأكد من تحديثه بالـ Master Key الخاص بك من صفحة API Keys بالموقع إذا قمت بتغييره
 
         let currentTxPage = 1; let allTxRows = [];
 
@@ -389,19 +389,58 @@
                 const data = await res.json();
                 const listings = data.record || [];
                 let html = "";
-                listings.forEach(item => {
+                
+                // جلب اسم المستثمر الحالي المسجل في الجلسة لمقارنته بالبائع
+                const currentUserName = localStorage.getItem('investor_name') || "";
+
+                listings.forEach((item, index) => {
                     if (item.shares !== "0") {
+                        let actionButton = "";
+                        
+                        // الذكاء: لو البائع هو نفس الشخص المفتوح حسابه حالياً تظهر كلمة مسح
+                        if(item.seller === currentUserName) {
+                            actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing(${index})">Delete</button>`;
+                        } else {
+                            actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;">Purchase</button>`;
+                        }
+
                         html += `<tr>
                             <td>${item.seller}</td>
                             <td>${item.shares} Units</td>
                             <td class="gold-text">${parseInt(item.price).toLocaleString()} GLD</td>
-                            <td><button class="badge badge-rev" style="border:none; cursor:pointer;">Purchase</button></td>
+                            <td>${actionButton}</td>
                         </tr>`;
                     }
                 });
                 document.getElementById('market-table-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
             } catch(e){
                 document.getElementById('market-table-body').innerHTML = "<tr><td colspan='4' style='text-align:center;'>Database connection error. Check your API Keys.</td></tr>";
+            }
+        }
+
+        async function deleteMarketListing(index) {
+            if(!confirm("Are you sure you want to delete this listing?")) return;
+            
+            try {
+                // 1. جلب البيانات كاملة من السيرفر أولاً
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const currentData = await res.json();
+                let listings = currentData.record || [];
+
+                // 2. مسح العنصر المحدد بناءً على مكانه (Index)
+                listings.splice(index, 1);
+
+                // 3. تحديث السيرفر بالقائمة الجديدة بعد المسح
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify(listings)
+                });
+
+                alert("🗑️ Listing Deleted Successfully!");
+                loadMarketListings(); // إعادة تحميل الجدول فوراً
+            } catch(err) {
+                alert("Error deleting listing.");
             }
         }
 
