@@ -129,7 +129,7 @@
             <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
                 <table class="custom-table">
-                    <thead><tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Seller Name</th><th>Available</th><th>Price/Share</th><th>Action</th></tr></thead>
                     <tbody id="market-table-body"></tbody>
                 </table>
             </div>
@@ -173,12 +173,11 @@
             if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
             const role = localStorage.getItem('user_role');
-            // التأكد من إظهار بوابات المستثمر بناءً على وجود اسم مسجل أو دور مستثمر
             if(role === 'investor' || localStorage.getItem('investor_name')) {
                 const item = document.getElementById('investor-menu-item');
                 if(item) item.style.display = 'flex';
                 
-                const ownerName = localStorage.getItem('investor_name') || "Investor";
+                const ownerName = localStorage.getItem('investor_name'] || "Investor";
                 const ownerShares = localStorage.getItem('investor_shares') || "0";
                 
                 if(document.getElementById('portal-owner-name')) document.getElementById('portal-owner-name').innerText = ownerName;
@@ -327,16 +326,36 @@
         }
 
         async function initiatePurchase(index) {
-            const buyerMPL = prompt("Please enter your MPL username to confirm transaction request:");
-            if (!buyerMPL) return alert("Purchase cancelled. MPL Username is required.");
-
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const currentData = await res.json();
                 let listings = currentData.record || [];
+                const item = listings[index];
+
+                const maxAvailable = parseInt(item.shares);
+                const pricePerShare = parseInt(item.price);
+
+                let inputCount = prompt(`كم عدد الأسهم التي تريد شراءها؟ (المتاح حالياً: ${maxAvailable})`);
+                if (!inputCount) return;
+
+                let buyCount = parseInt(inputCount);
+                if (isNaN(buyCount) || buyCount <= 0 || buyCount > maxAvailable) {
+                    return alert("العدد الذي أدخلته غير صالح أو يتجاوز الأسهم المتاحة.");
+                }
+
+                let totalAmount = buyCount * pricePerShare;
+                let sellerName = item.seller;
+
+                let confirmMsg = `⚠️ تعليمات الدفع:\n\nقم بتحويل مبلغ (${totalAmount.toLocaleString()} GLD) إلى حساب المالك (${sellerName}) عبر نظام MPL.\n\nبعد إتمام التحويل، اضغط موافق وأدخل اسم حسابك في MPL لتأكيد الطلب وإرساله للأدمن.`;
+                
+                if (!confirm(confirmMsg)) return;
+
+                const buyerMPL = prompt("أدخل اسم حسابك في MPL (اسمك الذي قمت بالتحويل منه):");
+                if (!buyerMPL) return alert("تم إلغاء الطلب لعدم إدخال اسم حساب MPL.");
 
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
+                listings[index].shares = buyCount; // تحديث العدد المطلوب شراؤه
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: "PUT",
@@ -344,9 +363,9 @@
                     body: JSON.stringify(listings)
                 });
 
-                alert("⏳ Request Sent! Awaiting Admin verification of the transaction.");
+                alert("✅ تم إرسال طلب الشراء بنجاح! في انتظار مراجعة وتأكيد الأدمن.");
                 loadMarketListings();
-            } catch(err) { alert("Error connecting to server."); }
+            } catch(err) { alert("حدث خطأ في الاتصال بالخادم."); }
         }
 
         async function loadAdminPanel() {
