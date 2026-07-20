@@ -80,7 +80,7 @@
         }
 
         th {
-            padding: 12px 16px;
+            padding: 14px 16px;
             color: var(--text-muted);
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -94,21 +94,38 @@
             color: #fff;
             font-size: 0.9rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            vertical-align: middle;
         }
 
         tr:hover td {
-            background: rgba(212, 175, 55, 0.03);
+            background: rgba(212, 175, 55, 0.02);
         }
 
-        .badge-table {
-            padding: 4px 8px;
+        /* بادجات المبالغ على ستايل المنصة المطلوبة */
+        .badge-amount {
+            display: inline-block;
+            padding: 6px 12px;
             border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 95px;
         }
-        .badge-rev { background: rgba(52, 199, 89, 0.12); color: #34c759; }
-        .badge-exp { background: rgba(255, 69, 58, 0.12); color: #ff453a; }
-        .tx-date { color: #a1a1a6; font-size: 0.8rem; display: block; margin-top: 2px; }
+        .badge-rev-live {
+            background: #2f6640;
+            color: #5cee82;
+            border: 1px solid rgba(92, 238, 130, 0.2);
+        }
+        .badge-exp-live {
+            background: #7c5a17;
+            color: #ffcd69;
+            border: 1px solid rgba(255, 205, 105, 0.2);
+        }
+        .td-date {
+            color: #a1a1a6;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
 
         @media (max-width: 768px) {
             .tables-section {
@@ -210,21 +227,21 @@
             </div>
         </section>
 
-        <!-- 📈 قسم الرسم البياني -->
+        <!-- 📈 قسم الرسم البياني التفاعلي المتصل النقاط -->
         <section class="chart-container">
             <div class="chart-header">
-                <h3><i class="fa-solid fa-chart-area gold-text"></i> Fund Performance Growth</h3>
-                <span class="badge">Live Analytics</span>
+                <h3><i class="fa-solid fa-chart-line gold-text"></i> Fund Valuation Trend Tracker</h3>
+                <span class="badge">Live Tick Chart</span>
             </div>
             <div class="chart-wrapper">
                 <canvas id="performanceChart"></canvas>
             </div>
         </section>
 
-        <!-- 🏢 الجداول -->
+        <!-- 🏢 الجداول المحدثة بالكامل -->
         <section class="tables-section">
             
-            <!-- جدول المستثمرين -->
+            <!-- جدول المستثمرين لايف -->
             <div class="custom-table-container">
                 <div class="table-header">
                     <h3><i class="fa-solid fa-user-tie gold-text"></i> Investors Ledger</h3>
@@ -247,19 +264,19 @@
                 </div>
             </div>
 
-            <!-- جدول أحدث المعاملات بالتاريخ (آخر 20 معاملة، الأحدث فوق) -->
+            <!-- جدول أحدث المعاملات بتوزيع الخانات الجديد وعزل المبالغ -->
             <div class="custom-table-container">
                 <div class="table-header">
-                    <h3><i class="fa-solid fa-list-check gold-text"></i> Recent Transactions</h3>
-                    <span class="badge" style="background: rgba(52, 199, 89, 0.1); color: #34c759; border-color: rgba(52, 199, 89, 0.2);">Latest 20 Items</span>
+                    <h3><i class="fa-solid fa-money-bill-transfer gold-text"></i> Recent Transactions</h3>
+                    <span class="badge" style="background: rgba(212, 175, 55, 0.1); color: #d4af37; border-color: rgba(212, 175, 55, 0.2);">Latest 20 Logs</span>
                 </div>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>Type / Date</th>
-                                <th>Statement / Description</th>
-                                <th>Amount</th>
+                                <th style="width: 25%;">Date</th>
+                                <th style="width: 50%;">Statement / Description</th>
+                                <th style="width: 25%; text-align: right;">Amount</th>
                             </tr>
                         </thead>
                         <tbody id="transactions-table-body">
@@ -288,32 +305,48 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             const ctx = document.getElementById('performanceChart').getContext('2d');
-            const goldGradient = ctx.createLinearGradient(0, 0, 0, 300);
-            goldGradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
-            goldGradient.addColorStop(1, 'rgba(212, 175, 55, 0.0)');
-
+            
+            // ستايل خط البورصة المتصل والنقاط الواضحة
             window.myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: [], 
                     datasets: [{
-                        label: 'Fund Growth (Gold)',
-                        data: [10, 20, 30, 45, 60, 80, 100],
+                        label: 'Fund Live Timeline',
+                        data: [],
                         borderColor: '#d4af37',
-                        borderWidth: 3,
+                        borderWidth: 2.5,
                         pointBackgroundColor: '#d4af37',
-                        backgroundColor: goldGradient,
-                        fill: true,
-                        tension: 0.4
+                        pointBorderColor: '#14100d',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4.5,
+                        pointHoverRadius: 7,
+                        tension: 0.2, 
+                        fill: false
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1c1713',
+                            titleColor: '#d4af37',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(212,175,55,0.2)',
+                            borderWidth: 1
+                        }
+                    },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#a1a1a6' } },
-                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#a1a1a6' } }
+                        x: { 
+                            grid: { color: 'rgba(255, 255, 255, 0.02)' }, 
+                            ticks: { color: '#a1a1a6', font: { size: 10 }, maxRotation: 45 } 
+                        },
+                        y: { 
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }, 
+                            ticks: { color: '#a1a1a6' } 
+                        }
                     }
                 }
             });
@@ -338,36 +371,44 @@
                     let tempRev = 0;
                     let tempExp = 0;
                     let txRowsArray = [];
+                    
+                    // مصفوفات لبناء خط الشارت التتابعي التراكمي
+                    let chartLabels = [];
+                    let chartData = [];
+                    let runningBalance = 0;
 
                     for (let i = 0; i < finRows.length; i++) {
                         const row = finRows[i];
                         if (row && row.c) {
-                            // قراءة التاريخ من العمود الأول (العمود A)
-                            let dateVal = row.c[0] ? row.c[0].f || row.c[0].v : "";
+                            let dateVal = row.c[0] ? row.c[0].f || row.c[0].v : "N/A";
                             let revVal = row.c[1] ? parseFloat(row.c[1].v) : 0;
                             let expVal = row.c[2] ? parseFloat(row.c[2].v) : 0;
-                            let desc = row.c[3] ? row.c[3].v : "";
+                            let desc = row.c[3] ? row.c[3].v : "Transaction Logs";
 
                             if (!isNaN(revVal) && revVal > 0) {
                                 tempRev += revVal;
+                                runningBalance += revVal;
+                                
+                                chartLabels.push(dateVal);
+                                chartData.push(runningBalance);
+
                                 txRowsArray.push(`<tr>
-                                    <td>
-                                        <span class="badge-table badge-rev">Revenue</span>
-                                        ${dateVal ? `<span class="tx-date">${dateVal}</span>` : ''}
-                                    </td>
-                                    <td>${desc || 'Inbound Funds'}</td>
-                                    <td style="color:#34c759; font-weight:600;">+${revVal.toFixed(2)} Gold</td>
+                                    <td class="td-date">${dateVal}</td>
+                                    <td>${desc}</td>
+                                    <td style="text-align: right;"><span class="badge-amount badge-rev-live">+${revVal.toFixed(2)}</span></td>
                                 </tr>`);
                             }
                             if (!isNaN(expVal) && expVal > 0) {
                                 tempExp += expVal;
+                                runningBalance -= expVal;
+
+                                chartLabels.push(dateVal);
+                                chartData.push(runningBalance);
+
                                 txRowsArray.push(`<tr>
-                                    <td>
-                                        <span class="badge-table badge-exp">Expense</span>
-                                        ${dateVal ? `<span class="tx-date">${dateVal}</span>` : ''}
-                                    </td>
-                                    <td>${desc || 'Outbound Operational Cost'}</td>
-                                    <td style="color:#ff453a; font-weight:600;">-${expVal.toFixed(2)} Gold</td>
+                                    <td class="td-date">${dateVal}</td>
+                                    <td>${desc}</td>
+                                    <td style="text-align: right;"><span class="badge-amount badge-exp-live">-${expVal.toFixed(2)}</span></td>
                                 </tr>`);
                             }
                         }
@@ -377,13 +418,21 @@
                         totalRevenues = tempRev;
                         totalExpenses = tempExp;
                         
+                        // عرض المعاملات الأحدث فوق
                         txRowsArray.reverse(); 
                         let slicedTxArray = txRowsArray.slice(0, 20); 
                         document.getElementById("transactions-table-body").innerHTML = slicedTxArray.join("");
                     }
+
+                    // تحديث شارت البورصة المتصل المتتالي بالبيانات الحقيقية بالكامل
+                    if(chartData.length > 0) {
+                        window.myChart.data.labels = chartLabels;
+                        window.myChart.data.datasets[0].data = chartData;
+                        window.myChart.update();
+                    }
                 }
 
-                // حساب الأرباح بدقة
+                // حساب الأرباح والمقاييس المخصصة
                 const totalProfits = totalRevenues - totalExpenses;
                 const shareProfit = totalProfits / 120;
                 const netShareProfit = shareProfit * 0.93;
@@ -433,7 +482,7 @@
                     document.getElementById("investors-table-body").innerHTML = investorsHtml;
                 }
 
-                // تحديث العدادات الفوقانية والشارت
+                // تحديث العدادات العلوية
                 const timeString = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
                 document.getElementById("sync-time").innerText = "Synced: " + timeString;
                 document.getElementById("last-update").innerText = "🔄 Updated " + timeString;
@@ -442,10 +491,8 @@
                 animateCurrency(document.getElementById("revenues"), totalRevenues);
                 animateCurrency(document.getElementById("expenses"), totalExpenses);
                 animateValue(document.getElementById("investors-count"), 0, liveInvestorsCount, 1000); 
-                
                 animateCurrency(document.getElementById("share-value"), 30); 
                 
-                // عرض الأرقام بدقة أكبر لو كانت قريبة من الصفر لتفادي الـ 0.00 الافتراضي
                 if (Math.abs(shareProfit) > 0 && Math.abs(shareProfit) < 0.01) {
                     document.getElementById("share-profit").innerText = shareProfit.toFixed(4) + " Gold";
                     document.getElementById("net-share-profit").innerText = netShareProfit.toFixed(4) + " Gold";
@@ -453,9 +500,6 @@
                     animateCurrency(document.getElementById("share-profit"), shareProfit); 
                     animateCurrency(document.getElementById("net-share-profit"), netShareProfit); 
                 }
-
-                window.myChart.data.datasets[0].data = [totalRevenues * 0.2, totalRevenues * 0.6, totalProfits];
-                window.myChart.update();
 
             } catch (error) {
                 console.error("Sync Error:", error);
