@@ -53,16 +53,15 @@
         .red-text { color: #ff453a; }
 
         .chart-container { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 20px; border-radius: 20px; height: 320px; position: relative; }
-        .table-wrapper { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; overflow-x: auto; margin-top: 15px; }
+        .table-wrapper { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; overflow: hidden; margin-top: 15px; }
         
-        .custom-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); vertical-align: middle; }
+        .custom-table { width: 100%; border-collapse: collapse; }
+        .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
         .custom-table th { background: rgba(212, 175, 55, 0.03); color: var(--gold); }
 
-        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; cursor: pointer; border: none; }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; }
         .badge-rev { background: rgba(48, 209, 88, 0.15); color: #30d158; }
         .badge-exp { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
-        .badge-neutral { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
@@ -101,7 +100,6 @@
     </div>
 
     <div class="main-content">
-        <!-- Dashboard -->
         <div id="page-dashboard" class="page-section active">
             <div class="section-header"><h2>Dashboard</h2><p>Live portfolio overview performance</p></div>
             <div class="metrics-grid">
@@ -113,19 +111,16 @@
             <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         </div>
 
-        <!-- Transactions -->
         <div id="page-transactions" class="page-section">
             <div class="section-header"><h2>Transactions Archive</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead><tbody id="archive-tx-body"></tbody></table></div>
         </div>
 
-        <!-- Shareholders -->
         <div id="page-shareholders" class="page-section">
             <div class="section-header"><h2>Shareholders Ledger</h2></div>
             <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
         </div>
 
-        <!-- Market -->
         <div id="page-market" class="page-section">
             <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
             <div class="table-wrapper">
@@ -136,7 +131,6 @@
             </div>
         </div>
 
-        <!-- Portal -->
         <div id="page-my-portal" class="page-section">
             <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
             <div class="metrics-grid">
@@ -151,7 +145,6 @@
             </div>
         </div>
 
-        <!-- Admin Approvals Panel -->
         <div id="page-admin-panel" class="page-section">
             <div class="section-header"><h2>Admin Control Panel</h2><p>Review requests, update your Google Sheet manually, then confirm here</p></div>
             <div class="table-wrapper">
@@ -174,12 +167,11 @@
             if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
             const role = localStorage.getItem('user_role');
-            
-            if(role === 'investor' && localStorage.getItem('investor_name')) {
+            if(role === 'investor' || localStorage.getItem('investor_name')) {
                 const item = document.getElementById('investor-menu-item');
                 if(item) item.style.display = 'flex';
                 
-                const ownerName = localStorage.getItem('investor_name');
+                const ownerName = localStorage.getItem('investor_name') || "Investor";
                 const ownerShares = localStorage.getItem('investor_shares') || "0";
                 
                 if(document.getElementById('portal-owner-name')) document.getElementById('portal-owner-name').innerText = ownerName;
@@ -189,7 +181,6 @@
             if (role === 'admin') {
                 const adminItem = document.getElementById('admin-menu-item');
                 if(adminItem) adminItem.style.display = 'flex';
-                localStorage.removeItem('investor_name');
             }
             
             initChart(); 
@@ -275,6 +266,7 @@
                     }
                 });
                 
+                // العكس لعرض الأحدث أولاً (Newest First)
                 rowsData.reverse();
                 
                 const body = document.getElementById('archive-tx-body');
@@ -308,17 +300,14 @@
                 const listings = data.record || [];
                 let html = "";
                 const currentUserName = localStorage.getItem('investor_name') || "";
-                const userRole = localStorage.getItem('user_role');
 
                 listings.forEach((item, index) => {
                     if (item.status === "active" || !item.status) {
                         let actionButton = "";
-                        if(userRole === 'admin') {
-                            actionButton = `<span style="color:var(--text-muted); font-size:0.85rem;">Admin View</span>`;
-                        } else if(item.seller === currentUserName) {
-                            actionButton = `<button class="badge badge-exp" onclick="deleteMarketListing(${index})">Delete</button>`;
+                        if(item.seller === currentUserName) {
+                            actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing(${index})">Delete</button>`;
                         } else {
-                            actionButton = `<button class="badge badge-rev" onclick="initiatePurchase(${index})">Purchase</button>`;
+                            actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;" onclick="initiatePurchase(${index})">Purchase</button>`;
                         }
 
                         html += `<tr>
@@ -362,11 +351,13 @@
                 const buyerMPL = prompt("Enter your MPL Username (the account you transferred from):");
                 if (!buyerMPL) return alert("Purchase cancelled because MPL Username was not provided.");
 
+                // تحديث العرض في حال الشراء الجزئي (إبقاء المتبقي في الماركت وإرسال المطلوب لـ pending)
                 const remainingShares = maxAvailable - buyCount;
                 
                 listings[index].status = "pending";
                 listings[index].buyer = buyerMPL;
-                listings[index].shares = buyCount;
+                listings[index].shares = buyCount; // الكمية المطلوبة المعلقة للأدمن
+                listings[index].originalIndex = index;
                 listings[index].remainingShares = remainingShares;
 
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
@@ -396,10 +387,9 @@
                             <td>${item.shares} Units</td>
                             <td>${total.toLocaleString()} GLD</td>
                             <td>
-                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                    <button class="badge badge-rev" onclick="processAdminDecision(${index}, 'approve')">Approve & Done</button>
-                                    <button class="badge badge-exp" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
-                                </div>
+                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'approve')">Approve</button>
+                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="processAdminDecision(${index}, 'reject')">Reject</button>
+                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="processAdminDecision(${index}, 'remove')">Remove / Done</button>
                             </td>
                         </tr>`;
                     }
@@ -411,9 +401,11 @@
 
         async function processAdminDecision(index, action) {
             if(action === 'approve') {
-                if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! This will approve and remove the request.")) return;
+                if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
             } else if(action === 'reject') {
                 if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
+            } else if(action === 'remove') {
+                if(!confirm("Are you sure you want to remove this row completely?")) return;
             }
 
             try {
@@ -422,8 +414,9 @@
                 let listings = currentData.record || [];
                 const item = listings[index];
 
-                if(action === 'approve') {
-                    if (item.remainingShares && item.remainingShares > 0) {
+                if(action === 'approve' || action === 'remove') {
+                    // إذا كان هناك متبقي من الشراء الجزئي، نقوم بإنشاء عنصر جديد active بالمتبقي وإزالة الطلب المعلق
+                    if (item.remainingShares && item.remainingShares > 0 && action === 'approve') {
                         listings.push({
                             seller: item.seller,
                             shares: item.remainingShares,
@@ -432,13 +425,15 @@
                         });
                     }
                     listings.splice(index, 1);
-                    alert("Approved and cleared successfully.");
+                    alert("Operation completed successfully.");
                 } else if(action === 'reject') {
+                    // إعادة الكمية الأصلية أو دمجها في الماركت
                     let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
                     listings[index].shares = restoredShares;
                     listings[index].status = "active";
                     delete listings[index].buyer;
                     delete listings[index].remainingShares;
+                    delete listings[index].originalIndex;
                     alert("Request rejected and shares returned to market.");
                 }
 
