@@ -26,6 +26,19 @@
             opacity: 0;
             pointer-events: none;
         }
+        .terms-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+        }
+        .terms-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +87,11 @@
                     <span>VERIFY ACCESS</span>
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 </button>
+
+                <!-- زرار الانتقال لصفحة الشروط والأحكام العامة للجميع -->
+                <a href="terms.html" class="terms-link">
+                    <i class="fa-solid fa-file-contract"></i> View Terms & Conditions / FAQ
+                </a>
             </form>
 
             <div class="login-footer">
@@ -121,7 +139,6 @@
             errDiv.style.display = 'none';
             btn.innerText = "AUTHENTICATING...";
 
-            // الكود العام الموحد (MPL2026)
             if(codeInput === "MPL2026") { 
                 localStorage.setItem('mocha_auth', 'true');
                 localStorage.setItem('user_role', 'public');
@@ -131,7 +148,6 @@
             }
 
             try {
-                // سحب بيانات الملاك والأدمن من شيت Investors
                 const response = await fetch(BASE_URL + "&sheet=Investors&nocache=" + new Date().getTime());
                 const text = await response.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
@@ -139,15 +155,12 @@
 
                 let authUser = null;
 
-                // الفحص والتحقق من الأكواد
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i];
                     if (row && row.c && row.c[2]) {
                         const sheetCode = row.c[2].v ? row.c[2].v.toString().trim() : "";
                         
                         if (sheetCode === codeInput) {
-                            // 🔍 إذا كان الكود في الصف الثالث (i = 2 تعني الصف الثالث لأن العد يبدأ من 0)
-                            // وبما أننا نتخطى الهيدر فـ i = 2 هي بالضبط الخلية C3 في الشيت
                             if (i === 2) {
                                 authUser = {
                                     role: 'admin',
@@ -167,7 +180,6 @@
                 }
 
                 if (authUser) {
-                    // تخزين البيانات والصلاحية المحددة بناءً على مكان الكود في الشيت
                     localStorage.setItem('mocha_auth', 'true');
                     localStorage.setItem('user_role', authUser.role);
                     localStorage.setItem('investor_name', authUser.name);
