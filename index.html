@@ -103,7 +103,7 @@
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 14px 45px 14px 45px; /* مساحة مناسبة للأيقونة يميناً ويساراً */
+            padding: 14px 45px 14px 45px;
             color: #fff;
             font-size: 0.95rem;
             outline: none;
@@ -115,7 +115,6 @@
             box-shadow: 0 0 10px var(--gold-glow);
         }
 
-        /* تعديل زر العين ليظهر داخل حقل الإدخال بشكل مضبوط ونظيف */
         .toggle-password {
             position: absolute;
             right: 14px;
@@ -201,7 +200,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* تنسيق النافذة المنبثقة لنظام الـ FAQ داخل الشروط */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -242,7 +240,6 @@
             text-align: left;
         }
 
-        /* تصميم عناصر الـ FAQ Accordion داخل المودال */
         .faq-item { 
             background: rgba(0,0,0,0.3); 
             border: 1px solid var(--border); 
@@ -329,7 +326,6 @@
         </div>
     </div>
 
-    <!-- نافذة منبثقة لعرض الشروط بنظام الـ FAQ Accordion -->
     <div class="modal-overlay" id="termsModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -401,7 +397,6 @@
             }
         }
 
-        // تفعيل تفاعل أسئلة الشروط والأحكام (FAQ Accordion) داخل المودال
         document.addEventListener("DOMContentLoaded", () => {
             const faqItems = document.querySelectorAll('.faq-item');
             faqItems.forEach(item => {
