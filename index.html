@@ -3,198 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mocha Enterprise | Premium Access</title>
+    <title>MPL Companies Shares | Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/animations.css">
-    
     <style>
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f0c0a;
+        :root {
+            --bg-dark: #0a0806;
+            --panel-bg: #120e0a;
+            --card-bg: rgba(26, 21, 16, 0.85);
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --text-main: #f5f5f7;
+            --text-muted: #a1a1a6;
+            --border: rgba(212, 175, 55, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: system-ui, -apple-system, sans-serif; 
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
+            justify-content: center;
+            padding: 20px;
         }
-        .loading-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .terms-link {
-            display: block;
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 440px;
             text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .crown-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            color: var(--gold);
+            font-size: 1.8rem;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .brand-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px 14px 45px;
+            color: #fff;
+            font-size: 0.95krem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-verify {
+            width: 100%;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px var(--gold-glow);
+        }
+
+        .btn-verify:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* تنسيق زر الشروط والأحكام الجديد والأنيق */
+        .btn-terms {
+            width: 100%;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px dashed var(--border);
+            color: var(--gold);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             margin-top: 15px;
-            color: #d4af37;
+            transition: all 0.3s ease;
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: opacity 0.3s;
         }
-        .terms-link:hover {
-            opacity: 0.8;
-            text-decoration: underline;
+
+        .btn-terms:hover {
+            background: rgba(212, 175, 55, 0.12);
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
         }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 25px 0;
+        }
+
+        .footer-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .badge-ecosystem {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* نافذة منبثقة (Modal) لعرض الشروط والأحكام بشكل سريع من صفحة الدخول */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h3 { color: var(--gold); font-size: 1.1rem; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-align: left;
+        }
+        .modal-body h4 { color: #fff; margin-top: 12px; margin-bottom: 4px; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen" class="loading-screen">
-        <div class="loader">
-            <div class="spinner"></div>
-            <p class="loading-text">Securing Connection...</p>
+    <div class="login-card">
+        <div class="crown-icon">
+            <i class="fa-solid fa-crown"></i>
+        </div>
+        
+        <div class="brand-title">MPL COMPANIES SHARES</div>
+        <div class="brand-subtitle">Private Investment Hub & Asset Management</div>
+
+        <div class="input-group">
+            <label>VIP Access Key</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-key"></i>
+                <input type="password" id="access-code" placeholder="Enter your MPL access code...">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                    <i class="fa-solid fa-eye" id="eye-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <button class="btn-verify" onclick="verifyAccess()">
+            <span>VERIFY ACCESS</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <!-- زر الشروط والأحكام الجديد والمحسن -->
+        <button class="btn-terms" onclick="openTermsModal()">
+            <i class="fa-solid fa-file-contract"></i>
+            <span>View Terms & Conditions / FAQ</span>
+        </button>
+
+        <div class="divider"></div>
+
+        <div class="footer-note">Authorized personnel only. All activities are logged.</div>
+        
+        <div>
+            <span class="badge-ecosystem">MPL Verified Ecosystem</span>
         </div>
     </div>
 
-    <div class="bg-overlay"></div>
-
-    <main class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="logo-wrapper">
-                    <i class="fa-solid fa-crown gold-glow"></i>
-                </div>
-                <h1>MOCHA ENTERPRISE</h1>
-                <p class="subtitle">Private Investment Hub & Asset Management</p>
+    <!-- Modal عرض الشروط والأحكام سريعاً -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-contract"></i> Terms & Conditions / FAQ</h3>
+                <button class="modal-close" onclick="closeTermsModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <form id="login-form" onsubmit="handleLogin(event)">
-                <div class="input-group">
-                    <label for="access-key">VIP ACCESS KEY</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-key input-icon"></i>
-                        <input 
-                            type="password" 
-                            id="access-key" 
-                            placeholder="Enter your MPL access code..." 
-                            required
-                        >
-                        <button type="button" id="toggle-password" onclick="togglePass()">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="error-message" class="error-message" style="display: none; color: #ff453a; margin: 10px 0; font-size: 0.9rem;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid Access Key. Try again.
-                </div>
-
-                <button type="submit" class="btn-submit">
-                    <span>VERIFY ACCESS</span>
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                </button>
-
-                <!-- زرار الانتقال لصفحة الشروط والأحكام العامة للجميع -->
-                <a href="terms.html" class="terms-link">
-                    <i class="fa-solid fa-file-contract"></i> View Terms & Conditions / FAQ
-                </a>
-            </form>
-
-            <div class="login-footer">
-                <p>Authorized personnel only. All activities are logged.</p>
-                <div class="mpl-badge">MPL Verified Ecosystem</div>
+            <div class="modal-body">
+                <h4>1. Total Shares Available</h4>
+                <p>The company consists of a total of 120 shares, and only 60 shares are offered for sale to investors.</p>
+                
+                <h4>2. Management Status (Top 3)</h4>
+                <p>The top 3 shareholders holding the highest number of shares in the company will be granted Manager status, giving them special authority and involvement in the company's strategic decisions.</p>
+                
+                <h4>3. Profit Payouts & Fees</h4>
+                <p>Profits are transferred on a monthly basis. The net profit per share will have a 7% bank transfer fee deducted from it before the final amount is sent to the shareholder.</p>
+                
+                <h4>4. No Cash Refunds</h4>
+                <p>The company does not offer cash refunds or buy back shares directly. Once shares are purchased, they cannot be returned for cash. You can freely sell your shares to other players through the platform's internal shares market.</p>
+                
+                <h4>5. Financial Transparency</h4>
+                <p>Every shareholder receives access to a dedicated dashboard to track revenues, expenses, and profits in real time.</p>
+                
+                <h4>6. Internal Market</h4>
+                <p>Yes, you can freely buy and sell your shares through the platform's internal shares market whenever you want.</p>
+                
+                <h4>7. Market Risk</h4>
+                <p>Profits depend entirely on the company's actual market performance and operational success; therefore, returns can vary from month to month.</p>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        const BASE_URL = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+        const SPREADSHEET_BASE = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
 
-        function hideLoader() {
-            const loader = document.getElementById('loading-screen');
-            if (loader) {
-                loader.classList.add('fade-out');
-                setTimeout(() => { loader.style.display = 'none'; }, 500);
-            }
-        }
-
-        window.addEventListener('load', hideLoader);
-        setTimeout(hideLoader, 1000);
-
-        function togglePass() {
-            const passInput = document.getElementById('access-key');
-            const eyeIcon = document.querySelector('#toggle-password i');
-            if (passInput.type === "password") {
-                passInput.type = "text";
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
+        function togglePasswordVisibility() {
+            const input = document.getElementById('access-code');
+            const eye = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.remove('fa-eye');
+                eye.classList.add('fa-eye-slash');
             } else {
-                passInput.type = "password";
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
+                input.type = 'password';
+                eye.classList.remove('fa-eye-slash');
+                eye.classList.add('fa-eye');
             }
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            
-            const codeInput = document.getElementById('access-key').value.trim();
-            const errDiv = document.getElementById('error-message');
-            const btn = document.querySelector('.btn-submit span');
-            
-            errDiv.style.display = 'none';
-            btn.innerText = "AUTHENTICATING...";
+        function openTermsModal() {
+            document.getElementById('termsModal').classList.add('active');
+        }
 
-            if(codeInput === "MPL2026") { 
+        function closeTermsModal() {
+            document.getElementById('termsModal').classList.remove('active');
+        }
+
+        // إغلاق النافذة عند النقر خارجها
+        window.onclick = function(event) {
+            const modal = document.getElementById('termsModal');
+            if (event.target === modal) {
+                closeTermsModal();
+            }
+        }
+
+        async function verifyAccess() {
+            const code = document.getElementById('access-code').value.trim();
+            if (!code) return alert("Please enter your access code.");
+            
+            if (code === "MOCCA2026ADMIN") {
                 localStorage.setItem('mocha_auth', 'true');
-                localStorage.setItem('user_role', 'public');
-                btn.innerText = "ACCESS GRANTED";
+                localStorage.setItem('user_role', 'admin');
                 window.location.href = 'dashboard.html';
                 return;
             }
 
             try {
-                const response = await fetch(BASE_URL + "&sheet=Investors&nocache=" + new Date().getTime());
-                const text = await response.text();
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors`);
+                const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
-                const rows = json.table.rows;
-
-                let authUser = null;
-
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    if (row && row.c && row.c[2]) {
-                        const sheetCode = row.c[2].v ? row.c[2].v.toString().trim() : "";
-                        
-                        if (sheetCode === codeInput) {
-                            if (i === 2) {
-                                authUser = {
-                                    role: 'admin',
-                                    name: 'System Admin',
-                                    shares: 0
-                                };
-                            } else {
-                                authUser = {
-                                    role: 'investor',
-                                    name: row.c[0] ? row.c[0].v : "Investor",
-                                    shares: row.c[1] ? parseFloat(row.c[1].v || 0) : 0
-                                };
+                
+                let found = false;
+                if(json.table && json.table.rows) {
+                    json.table.rows.forEach((r, i) => {
+                        if(i > 0 && r.c) {
+                            const name = r.c[0] ? r.c[0].v : "";
+                            const key = r.c[2] ? String(r.c[2].v) : "";
+                            const shares = r.c[1] ? r.c[1].v : 0;
+                            
+                            if(key === code) {
+                                found = true;
+                                localStorage.setItem('mocha_auth', 'true');
+                                localStorage.setItem('user_role', 'investor');
+                                localStorage.setItem('investor_name', name);
+                                localStorage.setItem('investor_shares', shares);
                             }
-                            break;
                         }
-                    }
+                    });
                 }
 
-                if (authUser) {
-                    localStorage.setItem('mocha_auth', 'true');
-                    localStorage.setItem('user_role', authUser.role);
-                    localStorage.setItem('investor_name', authUser.name);
-                    localStorage.setItem('investor_shares', authUser.shares);
-                    
-                    btn.innerText = "ACCESS GRANTED";
+                if(found) {
                     window.location.href = 'dashboard.html';
                 } else {
-                    btn.innerText = "VERIFY ACCESS";
-                    errDiv.style.display = 'block';
+                    alert("Invalid Access Code. Please check your key.");
                 }
-            } catch (err) {
-                console.error("Auth System Error:", err);
-                btn.innerText = "VERIFY ACCESS";
-                alert("❌ حدث خطأ أثناء الاتصال بقاعدة البيانات.");
+            } catch(e) {
+                alert("Connection error while verifying access key.");
             }
         }
     </script>
