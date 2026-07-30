@@ -68,6 +68,15 @@
         .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: #fff; }
         .btn-action { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
+        /* تنسيق أسئلة الشروط والأحكام (FAQ Accordion) */
+        .faq-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.3s ease; }
+        .faq-item:hover { border-color: var(--gold); }
+        .faq-question { padding: 16px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #fff; }
+        .faq-question::after { content: '+'; font-size: 1.3rem; color: var(--gold); transition: transform 0.3s ease; }
+        .faq-item.active .faq-question::after { transform: rotate(45deg); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; padding: 0 16px; color: var(--text-muted); line-height: 1.6; border-top: 1px solid transparent; font-size: 0.9rem; }
+        .faq-item.active .faq-answer { max-height: 300px; padding: 16px; border-top-color: var(--border); }
+
         @media (min-width: 992px) {
             .mobile-header { display: none; }
             .sidebar { left: 0; }
@@ -93,6 +102,7 @@
             <li onclick="switchPage('transactions')"><i class="fa-solid fa-list-check"></i> Transactions</li>
             <li onclick="switchPage('shareholders')"><i class="fa-solid fa-user-group"></i> Shareholders</li>
             <li onclick="switchPage('market')"><i class="fa-solid fa-shop"></i> Shares Market</li>
+            <li onclick="switchPage('terms')"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</li>
             <li id="investor-menu-item" style="display:none;" onclick="switchPage('my-portal')"><i class="fa-solid fa-user-shield"></i> My Portal</li>
             <li id="admin-menu-item" style="display:none;" onclick="switchPage('admin-panel')"><i class="fa-solid fa-lock"></i> Admin Approvals</li>
             <li onclick="handleLogout()" style="margin-top:auto; color:#ff453a;"><i class="fa-solid fa-power-off"></i> Logout</li>
@@ -128,6 +138,44 @@
                     <thead><tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr></thead>
                     <tbody id="market-table-body"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- صفحة الشروط والأحكام المضافة -->
+        <div id="page-terms" class="page-section">
+            <div class="section-header">
+                <h2>Terms & Conditions</h2>
+                <p>Frequently Asked Questions about our company shares and investment guidelines.</p>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">1. How many shares are available?</div>
+                    <div class="faq-answer">The company consists of a total of 120 shares, and only 60 shares are offered for sale to investors.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">2. What are the benefits of being a top shareholder? (Top 3 Managers)</div>
+                    <div class="faq-answer">The top 3 shareholders holding the highest number of shares in the company will be granted Manager status, giving them special authority and involvement in the company's strategic decisions.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">3. How do dividend payouts work, and are there any fees?</div>
+                    <div class="faq-answer">Profits are transferred on a monthly basis. The net profit per share will have a 7% bank transfer fee deducted from it before the final amount is sent to the shareholder.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">4. Can I get a refund or return my shares directly to the company?</div>
+                    <div class="faq-answer">No, the company does not offer cash refunds or buy back shares directly. Once shares are purchased, they cannot be returned for cash. If you wish to exit the company or liquidate your investment, you can freely sell your shares to other players through the platform's internal shares market.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">5. Will I have access to financial reports?</div>
+                    <div class="faq-answer">Yes! Every shareholder receives access to a dedicated dashboard to track revenues, expenses, and profits in real time.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">6. Can I sell my shares?</div>
+                    <div class="faq-answer">Yes, you can freely buy and sell your shares through the platform's internal shares market whenever you want.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">7. Are profits guaranteed?</div>
+                    <div class="faq-answer">Profits depend entirely on the company's actual market performance and operational success; therefore, returns can vary from month to month.</div>
+                </div>
             </div>
         </div>
 
@@ -188,6 +236,20 @@
             loadArchiveTransactions(); 
             loadShareholders(); 
             loadMarketListings();
+
+            // تفعيل تفاعل أسئلة الشروط والأحكام (FAQ Accordion)
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    item.classList.toggle('active');
+                });
+            });
         });
 
         function switchPage(pageId) {
