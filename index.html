@@ -416,9 +416,14 @@
             const code = document.getElementById('access-code').value.trim();
             if (!code) return alert("Please enter your access code.");
             
-            if (code === "MOCCA2026ADMIN") {
+            // التحقق من كود الأدمن أو الكود العام الافتراضي MPL2026
+            if (code === "MOCCA2026ADMIN" || code === "MPL2026") {
                 localStorage.setItem('mocha_auth', 'true');
-                localStorage.setItem('user_role', 'admin');
+                localStorage.setItem('user_role', code === "MOCCA2026ADMIN" ? 'admin' : 'investor');
+                if(code === "MPL2026") {
+                    localStorage.setItem('investor_name', 'General Access');
+                    localStorage.setItem('investor_shares', '0');
+                }
                 window.location.href = 'dashboard.html';
                 return;
             }
