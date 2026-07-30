@@ -3,396 +3,646 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPL Companies Shares | Login</title>
+    <title>☆ HaPpY MOCCA ☆ INDO ☆ | Executive Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-dark: #0a0806;
             --panel-bg: #120e0a;
-            --card-bg: rgba(26, 21, 16, 0.85);
+            --card-bg: rgba(26, 21, 16, 0.8);
             --gold: #d4af37;
             --gold-glow: rgba(212, 175, 55, 0.3);
             --text-main: #f5f5f7;
             --text-muted: #a1a1a6;
-            --border: rgba(212, 175, 55, 0.2);
+            --border: rgba(212, 175, 55, 0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: var(--bg-dark); 
-            color: var(--text-main); 
-            font-family: system-ui, -apple-system, sans-serif; 
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
 
-        .login-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px 30px;
-            width: 100%;
-            max-width: 440px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-        }
+        .mobile-header { display: flex; align-items: center; justify-content: space-between; background: var(--panel-bg); padding: 15px 20px; border-bottom: 1px solid var(--border); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+        .mobile-header .brand { font-size: 1.2rem; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+        .menu-toggle { background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
 
-        .crown-icon {
-            width: 70px;
-            height: 70px;
-            background: rgba(212, 175, 55, 0.08);
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px auto;
-            color: var(--gold);
-            font-size: 1.8rem;
-            box-shadow: 0 0 20px var(--gold-glow);
-        }
+        .sidebar { width: 260px; background: var(--panel-bg); height: 100vh; position: fixed; top: 0; left: -260px; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 30px 20px; z-index: 2000; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .sidebar.active { transform: translateX(260px); }
+        .sidebar .brand { font-size: 1.4rem; font-weight: bold; color: var(--gold); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .sidebar menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .sidebar menu li { padding: 14px 16px; border-radius: 10px; cursor: pointer; transition: 0.3s ease; display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-weight: 500; }
+        .sidebar menu li.active, .sidebar menu li:hover { background: rgba(212, 175, 55, 0.08); color: var(--gold); }
 
-        .brand-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--gold);
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1500; }
+        .sidebar-overlay.active { display: block; }
 
-        .brand-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 35px;
-        }
+        .main-content { padding: 90px 20px 40px 20px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.4s ease-out; }
 
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+        .section-header { margin-bottom: 25px; }
+        .section-header h2 { font-size: 1.6rem; font-weight: 700; color: #fff; }
+        .section-header p { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
 
-        .input-group label {
-            display: block;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gold);
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+        .metric-card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 20px 15px; border-radius: 16px; }
+        .metric-card h3 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .metric-card p { font-size: 1.3rem; font-weight: 700; }
 
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+        .gold-text { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
+        .green-text { color: #30d158; }
+        .red-text { color: #ff453a; }
 
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            color: var(--text-muted);
-        }
+        .chart-container { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 20px; border-radius: 20px; height: 320px; position: relative; }
+        .table-wrapper { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; overflow: hidden; margin-top: 15px; }
+        
+        .custom-table { width: 100%; border-collapse: collapse; }
+        .custom-table th, .custom-table td { padding: 14px 16px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .custom-table th { background: rgba(212, 175, 55, 0.03); color: var(--gold); }
 
-        .input-wrapper input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px 14px 45px;
-            color: #fff;
-            font-size: 0.95krem;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; }
+        .badge-rev { background: rgba(48, 209, 88, 0.15); color: #30d158; }
+        .badge-exp { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
 
-        .input-wrapper input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 10px var(--gold-glow);
-        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: #fff; }
+        .btn-action { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        .toggle-password {
-            position: absolute;
-            right: 16px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1rem;
-        }
+        /* تنسيق أسئلة الشروط والأحكام (FAQ Accordion) */
+        .faq-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.3s ease; }
+        .faq-item:hover { border-color: var(--gold); }
+        .faq-question { padding: 16px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #fff; }
+        .faq-question::after { content: '+'; font-size: 1.3rem; color: var(--gold); transition: transform 0.3s ease; }
+        .faq-item.active .faq-question::after { transform: rotate(45deg); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; padding: 0 16px; color: var(--text-muted); line-height: 1.6; border-top: 1px solid transparent; font-size: 0.9rem; }
+        .faq-item.active .faq-answer { max-height: 300px; padding: 16px; border-top-color: var(--border); }
 
-        .btn-verify {
-            width: 100%;
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: opacity 0.3s ease, transform 0.2s ease;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px var(--gold-glow);
+        @media (min-width: 992px) {
+            .mobile-header { display: none; }
+            .sidebar { left: 0; }
+            .main-content { padding-left: 280px; padding-top: 40px; }
+            .metrics-grid { grid-template-columns: repeat(4, 1fr); }
         }
-
-        .btn-verify:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        /* تنسيق زر الشروط والأحكام الجديد والأنيق */
-        .btn-terms {
-            width: 100%;
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px dashed var(--border);
-            color: var(--gold);
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .btn-terms:hover {
-            background: rgba(212, 175, 55, 0.12);
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
-        }
-
-        .divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.06);
-            margin: 25px 0;
-        }
-
-        .footer-note {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .badge-ecosystem {
-            display: inline-block;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            color: var(--gold);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* نافذة منبثقة (Modal) لعرض الشروط والأحكام بشكل سريع من صفحة الدخول */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--gold);
-            border-radius: 20px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .modal-header h3 { color: var(--gold); font-size: 1.1rem; }
-        .modal-close { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-            text-align: left;
-        }
-        .modal-body h4 { color: #fff; margin-top: 12px; margin-bottom: 4px; font-size: 0.95rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="crown-icon">
-            <i class="fa-solid fa-crown"></i>
-        </div>
-        
-        <div class="brand-title">MPL COMPANIES SHARES</div>
-        <div class="brand-subtitle">Private Investment Hub & Asset Management</div>
-
-        <div class="input-group">
-            <label>VIP Access Key</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-key"></i>
-                <input type="password" id="access-code" placeholder="Enter your MPL access code...">
-                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                    <i class="fa-solid fa-eye" id="eye-icon"></i>
-                </button>
-            </div>
-        </div>
-
-        <button class="btn-verify" onclick="verifyAccess()">
-            <span>VERIFY ACCESS</span>
-            <i class="fa-solid fa-arrow-right"></i>
-        </button>
-
-        <!-- زر الشروط والأحكام الجديد والمحسن -->
-        <button class="btn-terms" onclick="openTermsModal()">
-            <i class="fa-solid fa-file-contract"></i>
-            <span>View Terms & Conditions / FAQ</span>
-        </button>
-
-        <div class="divider"></div>
-
-        <div class="footer-note">Authorized personnel only. All activities are logged.</div>
-        
-        <div>
-            <span class="badge-ecosystem">MPL Verified Ecosystem</span>
-        </div>
+    <div class="mobile-header">
+        <div class="brand"><i class="fa-solid fa-crown"></i> ☆ HaPpY MOCCA ☆ INDO ☆</div>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </div>
 
-    <!-- Modal عرض الشروط والأحكام سريعاً -->
-    <div class="modal-overlay" id="termsModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-file-contract"></i> Terms & Conditions / FAQ</h3>
-                <button class="modal-close" onclick="closeTermsModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <div class="sidebar" id="sidebarMenu">
+        <div class="brand"><i class="fa-solid fa-crown"></i> ☆ HaPpY MOCCA ☆ INDO ☆</div>
+        <menu>
+            <li class="active" onclick="switchPage('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
+            <li onclick="switchPage('transactions')"><i class="fa-solid fa-list-check"></i> Transactions</li>
+            <li onclick="switchPage('shareholders')"><i class="fa-solid fa-user-group"></i> Shareholders</li>
+            <li onclick="switchPage('market')"><i class="fa-solid fa-shop"></i> Shares Market</li>
+            <li onclick="switchPage('terms')"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</li>
+            <li id="investor-menu-item" style="display:none;" onclick="switchPage('my-portal')"><i class="fa-solid fa-user-shield"></i> My Portal</li>
+            <li id="admin-menu-item" style="display:none;" onclick="switchPage('admin-panel')"><i class="fa-solid fa-lock"></i> Admin Approvals</li>
+            <li onclick="handleLogout()" style="margin-top:auto; color:#ff453a;"><i class="fa-solid fa-power-off"></i> Logout</li>
+        </menu>
+    </div>
+
+    <div class="main-content">
+        <div id="page-dashboard" class="page-section active">
+            <div class="section-header"><h2>Dashboard</h2><p>Live portfolio overview performance</p></div>
+            <div class="metrics-grid">
+                <div class="metric-card"><h3>Net Profits</h3><p id="total-profits" class="gold-text">0.00</p></div>
+                <div class="metric-card"><h3>Revenues</h3><p id="green-text" class="green-text">0.00</p></div>
+                <div class="metric-card"><h3>Expenses</h3><p id="expenses" class="red-text">0.00</p></div>
+                <div class="metric-card"><h3>Per Share</h3><p id="share-profit">0.00</p></div>
             </div>
-            <div class="modal-body">
-                <h4>1. Total Shares Available</h4>
-                <p>The company consists of a total of 120 shares, and only 60 shares are offered for sale to investors.</p>
-                
-                <h4>2. Management Status (Top 3)</h4>
-                <p>The top 3 shareholders holding the highest number of shares in the company will be granted Manager status, giving them special authority and involvement in the company's strategic decisions.</p>
-                
-                <h4>3. Profit Payouts & Fees</h4>
-                <p>Profits are transferred on a monthly basis. The net profit per share will have a 7% bank transfer fee deducted from it before the final amount is sent to the shareholder.</p>
-                
-                <h4>4. No Cash Refunds</h4>
-                <p>The company does not offer cash refunds or buy back shares directly. Once shares are purchased, they cannot be returned for cash. You can freely sell your shares to other players through the platform's internal shares market.</p>
-                
-                <h4>5. Financial Transparency</h4>
-                <p>Every shareholder receives access to a dedicated dashboard to track revenues, expenses, and profits in real time.</p>
-                
-                <h4>6. Internal Market</h4>
-                <p>Yes, you can freely buy and sell your shares through the platform's internal shares market whenever you want.</p>
-                
-                <h4>7. Market Risk</h4>
-                <p>Profits depend entirely on the company's actual market performance and operational success; therefore, returns can vary from month to month.</p>
+            <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+        </div>
+
+        <div id="page-transactions" class="page-section">
+            <div class="section-header"><h2>Transactions Archive</h2></div>
+            <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Date</th><th>Statement</th><th>Amount</th></tr></thead><tbody id="archive-tx-body"></tbody></table></div>
+        </div>
+
+        <div id="page-shareholders" class="page-section">
+            <div class="section-header"><h2>Shareholders Ledger</h2></div>
+            <div class="table-wrapper"><table class="custom-table"><thead><tr><th>Name</th><th>Shares</th><th>Ownership</th></tr></thead><tbody id="sh-table-body"></tbody></table></div>
+        </div>
+
+        <div id="page-market" class="page-section">
+            <div class="section-header"><h2>Shares Market</h2><p>Live global marketplace</p></div>
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead><tr><th>Seller Name</th><th>Shares</th><th>Price</th><th>Action</th></tr></thead>
+                    <tbody id="market-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- صفحة الشروط والأحكام المضافة -->
+        <div id="page-terms" class="page-section">
+            <div class="section-header">
+                <h2>Terms & Conditions</h2>
+                <p>Frequently Asked Questions about our company shares and investment guidelines.</p>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">1. How many shares are available?</div>
+                    <div class="faq-answer">The company consists of a total of 120 shares, and only 60 shares are offered for sale to investors.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">2. What are the benefits of being a top shareholder? (Top 3 Managers)</div>
+                    <div class="faq-answer">The top 3 shareholders holding the highest number of shares in the company will be granted Manager status, giving them special authority and involvement in the company's strategic decisions.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">3. How do dividend payouts work, and are there any fees?</div>
+                    <div class="faq-answer">Profits are transferred on a monthly basis. The net profit per share will have a 7% bank transfer fee deducted from it before the final amount is sent to the shareholder.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">4. Can I get a refund or return my shares directly to the company?</div>
+                    <div class="faq-answer">No, the company does not offer cash refunds or buy back shares directly. Once shares are purchased, they cannot be returned for cash. If you wish to exit the company or liquidate your investment, you can freely sell your shares to other players through the platform's internal shares market.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">5. Will I have access to financial reports?</div>
+                    <div class="faq-answer">Yes! Every shareholder receives access to a dedicated dashboard to track revenues, expenses, and profits in real time.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">6. Can I sell my shares?</div>
+                    <div class="faq-answer">Yes, you can freely buy and sell your shares through the platform's internal shares market whenever you want.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">7. Are profits guaranteed?</div>
+                    <div class="faq-answer">Profits depend entirely on the company's actual market performance and operational success; therefore, returns can vary from month to month.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-my-portal" class="page-section">
+            <div class="section-header"><h2>Investor Portal: <span id="portal-owner-name" class="gold-text"></span></h2></div>
+            <div class="metrics-grid">
+                <div class="metric-card"><h3>My Shares</h3><p id="portal-shares-count" class="gold-text">0</p></div>
+                <div class="metric-card"><h3>Est. Profit</h3><p id="portal-est-profit" class="green-text">0.00</p></div>
+            </div>
+            <h3 style="margin: 35px 0 15px 0; font-size: 1.2rem;"><i class="fa-solid fa-tags" style="color: var(--gold)"></i> List My Shares for Sale</h3>
+            <div class="metric-card" style="max-width: 450px;">
+                <div class="form-group"><label>Volume:</label><input type="number" id="sell-count"></div>
+                <div class="form-group"><label>Price per Share:</label><input type="number" id="sell-price"></div>
+                <button id="btn-publish-listing" class="btn-action" onclick="listSharesOnMarket()">Publish Live Listing</button>
+            </div>
+        </div>
+
+        <div id="page-admin-panel" class="page-section">
+            <div class="section-header"><h2>Admin Control Panel</h2><p>Review requests, update your Google Sheet manually, then confirm here</p></div>
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead><tr><th>Seller</th><th>Buyer (MPL)</th><th>Shares</th><th>Total Price</th><th>Actions</th></tr></thead>
+                    <tbody id="admin-table-body"><tr><td colspan="5" style="text-align:center; padding:20px;">No pending approvals.</td></tr></tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
         const SPREADSHEET_BASE = "https://docs.google.com/spreadsheets/d/11-u2UCKiW1VmYhm3X8MhD_f4PhyfdXi0DtJG41zdHT8/gviz/tq?tqx=out:json";
+        const BIN_ID = "6a5e2be9da38895dfe766827";
+        const MASTER_KEY = "$2a$10$HiNNr6inK3jh2WDUwy7uRuxjWlQxU9p/RocZHrXf7d0k3R8q0FH.G"; 
 
-        function togglePasswordVisibility() {
-            const input = document.getElementById('access-code');
-            const eye = document.getElementById('eye-icon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                eye.classList.remove('fa-eye');
-                eye.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                eye.classList.remove('fa-eye-slash');
-                eye.classList.add('fa-eye');
-            }
-        }
+        function toggleMenu() { document.getElementById('sidebarMenu').classList.toggle('active'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
 
-        function openTermsModal() {
-            document.getElementById('termsModal').classList.add('active');
-        }
-
-        function closeTermsModal() {
-            document.getElementById('termsModal').classList.remove('active');
-        }
-
-        // إغلاق النافذة عند النقر خارجها
-        window.onclick = function(event) {
-            const modal = document.getElementById('termsModal');
-            if (event.target === modal) {
-                closeTermsModal();
-            }
-        }
-
-        async function verifyAccess() {
-            const code = document.getElementById('access-code').value.trim();
-            if (!code) return alert("Please enter your access code.");
+        document.addEventListener("DOMContentLoaded", () => {
+            if(localStorage.getItem('mocha_auth') !== 'true') window.location.href = 'index.html';
             
-            if (code === "MOCCA2026ADMIN") {
-                localStorage.setItem('mocha_auth', 'true');
-                localStorage.setItem('user_role', 'admin');
-                window.location.href = 'dashboard.html';
-                return;
+            const role = localStorage.getItem('user_role');
+            if(role === 'investor' || localStorage.getItem('investor_name')) {
+                const item = document.getElementById('investor-menu-item');
+                if(item) item.style.display = 'flex';
+                
+                const ownerName = localStorage.getItem('investor_name') || "Investor";
+                const ownerShares = localStorage.getItem('investor_shares') || "0";
+                
+                if(document.getElementById('portal-owner-name')) document.getElementById('portal-owner-name').innerText = ownerName;
+                if(document.getElementById('portal-shares-count')) document.getElementById('portal-shares-count').innerText = ownerShares;
+            } 
+            
+            if (role === 'admin') {
+                const adminItem = document.getElementById('admin-menu-item');
+                if(adminItem) adminItem.style.display = 'flex';
             }
+            
+            initChart(); 
+            loadCurrentMonthDashboard(); 
+            loadArchiveTransactions(); 
+            loadShareholders(); 
+            loadMarketListings();
 
+            // تفعيل تفاعل أسئلة الشروط والأحكام (FAQ Accordion)
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    item.classList.toggle('active');
+                });
+            });
+        });
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page-' + pageId);
+            if(target) target.classList.add('active');
+            toggleMenu();
+            if(pageId === 'market') loadMarketListings();
+            if(pageId === 'admin-panel') loadAdminPanel();
+        }
+
+        async function loadCurrentMonthDashboard() {
             try {
-                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors`);
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
                 const text = await res.text();
                 const json = JSON.parse(text.substr(47).slice(0, -2));
+                let rev = 0, exp = 0, cLabels = [], cData = [], bal = 0;
                 
-                let found = false;
                 if(json.table && json.table.rows) {
-                    json.table.rows.forEach((r, i) => {
-                        if(i > 0 && r.c) {
-                            const name = r.c[0] ? r.c[0].v : "";
-                            const key = r.c[2] ? String(r.c[2].v) : "";
-                            const shares = r.c[1] ? r.c[1].v : 0;
+                    json.table.rows.forEach(r => {
+                        if(r && r.c) {
+                            let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
+                            let rV = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                            let eV = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
                             
-                            if(key === code) {
-                                found = true;
-                                localStorage.setItem('mocha_auth', 'true');
-                                localStorage.setItem('user_role', 'investor');
-                                localStorage.setItem('investor_name', name);
-                                localStorage.setItem('investor_shares', shares);
+                            if(rV > 0 || eV > 0) {
+                                rev += rV;
+                                exp += eV;
+                                bal += (rV - eV);
+                                cLabels.push(d);
+                                cData.push(bal);
                             }
                         }
                     });
                 }
-
-                if(found) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    alert("Invalid Access Code. Please check your key.");
+                
+                const profits = rev - exp;
+                const sp = profits / 120;
+                
+                if(document.getElementById('total-profits')) document.getElementById('total-profits').innerText = profits.toLocaleString() + " GLD";
+                if(document.getElementById('green-text')) document.getElementById('green-text').innerText = rev.toLocaleString() + " GLD";
+                if(document.getElementById('expenses')) document.getElementById('expenses').innerText = exp.toLocaleString() + " GLD";
+                if(document.getElementById('share-profit')) document.getElementById('share-profit').innerText = sp.toFixed(2) + " GLD";
+                
+                const portalProfitEl = document.getElementById('portal-est-profit');
+                if(portalProfitEl) {
+                    const userShares = parseFloat(localStorage.getItem('investor_shares') || 0);
+                    portalProfitEl.innerText = (sp * userShares).toFixed(2) + " GLD";
                 }
-            } catch(e) {
-                alert("Connection error while verifying access key.");
+
+                if(window.myChart && cLabels.length > 0) {
+                    window.myChart.data.labels = cLabels; 
+                    window.myChart.data.datasets[0].data = cData; 
+                    window.myChart.update();
+                }
+            } catch(e){ console.error(e); }
+        }
+
+        async function loadArchiveTransactions() {
+            try {
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Sheet2&nocache=${new Date().getTime()}`);
+                const text = await res.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                let rowsData = [];
+                
+                if(json.table && json.table.rows) {
+                    json.table.rows.forEach(r => {
+                        if(r && r.c) {
+                            let d = r.c[0] ? r.c[0].f || r.c[0].v : "";
+                            let rv = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                            let ev = r.c[2] ? parseFloat(r.c[2].v || 0) : 0;
+                            let desc = r.c[3] ? r.c[3].v : "";
+                            
+                            if(rv > 0) {
+                                rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-rev">+${rv.toLocaleString()}</span></td></tr>`);
+                            } else if(ev > 0) {
+                                rowsData.push(`<tr><td>${d}</td><td>${desc}</td><td><span class="badge badge-exp">-${ev.toLocaleString()}</span></td></tr>`);
+                            }
+                        }
+                    });
+                }
+                
+                rowsData.reverse();
+                
+                const body = document.getElementById('archive-tx-body');
+                if(body) body.innerHTML = rowsData.join("") || "<tr><td colspan='3' style='text-align:center;'>No Transactions Found.</td></tr>";
+            } catch(e){}
+        }
+
+        async function loadShareholders() {
+            try {
+                const res = await fetch(`${SPREADSHEET_BASE}&sheet=Investors&nocache=${new Date().getTime()}`);
+                const text = await res.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                let h = "";
+                
+                if(json.table && json.table.rows) {
+                    json.table.rows.forEach((r,i) => {
+                        if(i > 0 && r.c && r.c[0]) {
+                            const name = r.c[0].v;
+                            const shares = r.c[1] ? parseFloat(r.c[1].v || 0) : 0;
+                            h += `<tr><td>${name}</td><td>${shares}</td><td><span class="gold-text">${((shares/120)*100).toFixed(1)}%</span></td></tr>`;
+                        }
+                    });
+                }
+                const body = document.getElementById('sh-table-body');
+                if(body) body.innerHTML = h;
+            } catch(e){}
+        }
+
+        async function loadMarketListings() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const data = await res.json();
+                const listings = data.record || [];
+                let html = "";
+                const currentUserName = localStorage.getItem('investor_name') || "";
+
+                listings.forEach((item, index) => {
+                    if (item.status === "active" || !item.status) {
+                        let actionButton = "";
+                        if(item.seller === currentUserName) {
+                            actionButton = `<button class="badge badge-exp" style="border:none; cursor:pointer;" onclick="deleteMarketListing('${item.seller}', '${item.shares}', '${item.price}')">Delete</button>`;
+                        } else {
+                            actionButton = `<button class="badge badge-rev" style="border:none; cursor:pointer;" onclick="initiatePurchase(${index})">Purchase</button>`;
+                        }
+
+                        html += `<tr>
+                            <td>${item.seller}</td>
+                            <td>${item.shares} Units</td>
+                            <td class="gold-text">${parseInt(item.price).toLocaleString()} GLD</td>
+                            <td>${actionButton}</td>
+                        </tr>`;
+                    }
+                });
+                const body = document.getElementById('market-table-body');
+                if(body) body.innerHTML = html || "<tr><td colspan='4' style='text-align:center; color:var(--text-muted); padding: 30px;'>No active listings.</td></tr>";
+            } catch(e){ }
+        }
+
+        async function initiatePurchase(index) {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const currentData = await res.json();
+                let listings = currentData.record || [];
+                const item = listings[index];
+
+                const maxAvailable = parseInt(item.shares);
+                const pricePerShare = parseInt(item.price);
+
+                let inputCount = prompt(`Enter number of shares to buy (Available: ${maxAvailable}):`);
+                if (!inputCount) return;
+
+                let buyCount = parseInt(inputCount);
+                if (isNaN(buyCount) || buyCount <= 0 || buyCount > maxAvailable) {
+                    return alert("Invalid share quantity or exceeds available units.");
+                }
+
+                let totalAmount = buyCount * pricePerShare;
+                let sellerName = item.seller;
+
+                let confirmMsg = `Payment Instructions:\n\nPlease transfer (${totalAmount.toLocaleString()} GLD) to owner (${sellerName}) via MPL.\n\nAfter payment, click OK and enter your MPL username to submit your request to the admin.`;
+                
+                if (!confirm(confirmMsg)) return;
+
+                const buyerMPL = prompt("Enter your MPL Username (the account you transferred from):");
+                if (!buyerMPL) return alert("Purchase cancelled because MPL Username was not provided.");
+
+                const remainingShares = maxAvailable - buyCount;
+                
+                listings[index].status = "pending";
+                listings[index].buyer = buyerMPL;
+                listings[index].shares = buyCount;
+                listings[index].remainingShares = remainingShares;
+
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify(listings)
+                });
+
+                alert("Request sent successfully! Awaiting admin review.");
+                loadMarketListings();
+            } catch(err) { alert("Server connection error."); }
+        }
+
+        async function loadAdminPanel() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${new Date().getTime()}`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const data = await res.json();
+                const listings = data.record || [];
+                let html = "";
+
+                listings.forEach((item, index) => {
+                    if (item.status === "pending") {
+                        const total = parseInt(item.shares) * parseInt(item.price);
+                        
+                        html += `<tr>
+                            <td>${item.seller}</td>
+                            <td><span class="gold-text">${item.buyer}</span></td>
+                            <td>${item.shares} Units</td>
+                            <td>${total.toLocaleString()} GLD</td>
+                            <td>
+                                <button class="badge badge-rev" style="border:none; cursor:pointer; margin-right:5px;" onclick="approveAdmin('${item.seller}', '${item.buyer}')">Approve</button>
+                                <button class="badge badge-exp" style="border:none; cursor:pointer; margin-right:5px;" onclick="rejectAdmin('${item.seller}', '${item.buyer}')">Reject</button>
+                                <button class="badge" style="background:#444; color:#fff; border:none; cursor:pointer;" onclick="removeAdmin('${item.seller}', '${item.buyer}')">Remove / Done</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+                const body = document.getElementById('admin-table-body');
+                if(body) body.innerHTML = html || "<tr><td colspan='5' style='text-align:center; padding:20px;'>No pending approvals.</td></tr>";
+            } catch(e){}
+        }
+
+        async function approveAdmin(seller, buyer) {
+            if(!confirm("Warning: Click OK only if you have already updated the Google Sheet manually and transferred the shares! Proceed?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                
+                const index = listings.findIndex(item => item.seller === seller && item.buyer === buyer && item.status === "pending");
+
+                if(index !== -1) {
+                    let item = listings[index];
+                    if (item.remainingShares && item.remainingShares > 0) {
+                        listings.push({
+                            seller: item.seller,
+                            shares: item.remainingShares,
+                            price: item.price,
+                            status: "active"
+                        });
+                    }
+                    listings.splice(index, 1);
+                    
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                        body: JSON.stringify(listings)
+                    });
+                    
+                    if(updateRes.ok) {
+                        alert("Approved and cleared successfully from database.");
+                        loadAdminPanel();
+                    } else {
+                        alert("Failed to update database.");
+                    }
+                } else {
+                    alert("Request not found in database.");
+                }
+            } catch(e) { alert("Error connecting to server."); }
+        }
+
+        async function rejectAdmin(seller, buyer) {
+            if(!confirm("Are you sure you want to reject this request and return shares to the market?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                
+                const index = listings.findIndex(item => item.seller === seller && item.buyer === buyer && item.status === "pending");
+
+                if(index !== -1) {
+                    let item = listings[index];
+                    let restoredShares = parseInt(item.shares) + (item.remainingShares || 0);
+                    listings[index].shares = restoredShares;
+                    listings[index].status = "active";
+                    delete listings[index].buyer;
+                    delete listings[index].remainingShares;
+
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                        body: JSON.stringify(listings)
+                    });
+
+                    if(updateRes.ok) {
+                        alert("Request rejected and shares returned to market.");
+                        loadAdminPanel();
+                    } else {
+                        alert("Failed to update database.");
+                    }
+                } else {
+                    alert("Request not found in database.");
+                }
+            } catch(e) { alert("Error."); }
+        }
+
+        async function removeAdmin(seller, buyer) {
+            if(!confirm("Are you sure you want to remove this row completely?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                
+                const index = listings.findIndex(item => item.seller === seller && item.buyer === buyer && item.status === "pending");
+
+                if (index !== -1) {
+                    listings.splice(index, 1);
+
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                        body: JSON.stringify(listings)
+                    });
+
+                    if (updateRes.ok) {
+                        alert("Removed successfully from database.");
+                        loadAdminPanel();
+                    } else {
+                        alert("Failed to update database.");
+                    }
+                } else {
+                    alert("Request not found in database.");
+                }
+            } catch(e) { 
+                console.error(e);
+                alert("Network or Server Error."); 
             }
         }
+
+        async function deleteMarketListing(sellerName, sharesCount, priceValue) {
+            if(!confirm("Are you sure you want to delete this listing?")) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let data = await res.json();
+                let listings = data.record || [];
+                
+                const index = listings.findIndex(item => 
+                    item.seller === sellerName && 
+                    parseInt(item.shares) === parseInt(sharesCount) && 
+                    parseInt(item.price) === parseInt(priceValue) && 
+                    (item.status === "active" || !item.status)
+                );
+
+                if(index !== -1) {
+                    listings.splice(index, 1);
+                    
+                    const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                        method: "PUT", 
+                        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+                        body: JSON.stringify(listings) 
+                    });
+
+                    if(updateRes.ok) {
+                        alert("Deleted successfully."); 
+                        loadMarketListings();
+                    } else {
+                        alert("Failed to delete from database.");
+                    }
+                } else {
+                    alert("Listing not found in database.");
+                }
+            } catch(e){ 
+                console.error(e);
+                alert("Error connecting to server."); 
+            }
+        }
+
+        async function listSharesOnMarket() {
+            const count = document.getElementById('sell-count').value;
+            const price = document.getElementById('sell-price').value;
+            if(!count || !price) return alert("Please fill fields.");
+            const btn = document.getElementById('btn-publish-listing');
+            if(btn) btn.disabled = true;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                let listings = (await res.json()).record || [];
+                listings.push({ seller: localStorage.getItem('investor_name') || "Investor", shares: count, price: price, status: "active" });
+                
+                const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                    method: "PUT", 
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+                    body: JSON.stringify(listings) 
+                });
+
+                if(updateRes.ok) {
+                    alert("Published!"); 
+                    document.getElementById('sell-count').value = ''; 
+                    document.getElementById('sell-price').value = ''; 
+                    switchPage('market');
+                } else {
+                    alert("Failed to publish listing.");
+                }
+            } catch(err) { alert("Error."); } finally { if(btn) btn.disabled = false; }
+        }
+
+        function initChart() { 
+            const chartEl = document.getElementById('performanceChart');
+            if(!chartEl) return;
+            const ctx = chartEl.getContext('2d'); 
+            window.myChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ data: [], borderColor: '#d4af37', fill: true, tension: 0.15 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); 
+        }
+        
+        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
